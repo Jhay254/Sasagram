@@ -1,7 +1,69 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum EventCategory {
+  LIFE_EVENT
+  WORK
+  PERSONAL
+  OTHER
+}
+
+enum Role {
+  USER
+  ADMIN
+  DEVELOPER
+}
+
+model User {
+  id              String          @id @default(uuid())
+  email           String          @unique
+  name            String?
+  displayName     String?
+  firstName       String?
+  lastName        String?
+  role            Role            @default(USER)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  events                  Event[]
+  tagsCreated             EventTag[]      @relation("TagsCreated")
+  tagsReceived            EventTag[]      @relation("TagsReceived")
+  posts                   Post[]
+  diaryEntries            DiaryEntry[]
+  biographyEvents         BiographyEvent[]
+  developerProfile        DeveloperProfile?
+  apiKeys                 APIKey[]
+  organizations           OrganizationMembership[]
+  interrogationSessions   InterrogationSession[]
+  audioDiaryEntries       AudioDiaryEntry[]
+  deepfakeAnalyses        DeepfakeAnalysis[]
+  trustBadges             TrustBadge[]
+  legacyPlan              LegacyPlan?
+  celebrityProfile        CelebrityProfile?
+  referralCode            ReferralCode?
+  referralsReferred       Referral[]      @relation("Referrer")
+  referralsReferredBy     Referral[]      @relation("ReferredUser")
+  referralRewards         ReferralReward[]
+  mergerSuggestions       MergerSuggestion[]
+  deadMansSwitch          DeadMansSwitch?
+  deathVerifications      DeathVerification[]
+  posthumousContent       PosthumousContent[]
+  finalChapters           FinalChapter[]
+  
+  @@map("users")
+}
 
 model Event {
   id              String          @id @default(uuid())
   userId          String
+  user            User            @relation(fields: [userId], references: [id])
   title           String
   description     String?         @db.Text
   date            DateTime
@@ -31,4 +93,232 @@ model EventTag {
   @@index([creatorId])
   @@index([receiverId])
   @@map("event_tags")
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DiaryEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BiographyEvent {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeveloperProfile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model APIKey {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  key       String   @unique
+  createdAt DateTime @default(now())
+}
+
+model HistoricalArchive {
+  id        String   @id @default(uuid())
+  title     String
+  content   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  importBatchId String?
+  importBatch ArchiveImportBatch? @relation(fields: [importBatchId], references: [id])
+}
+
+model ArchiveImportBatch {
+  id        String   @id @default(uuid())
+  status    String
+  archives  HistoricalArchive[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  members   OrganizationMembership[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrganizationMembership {
+  id             String       @id @default(uuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  role           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model InterrogationSession {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AudioDiaryEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeepfakeAnalysis {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  result    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TrustBadge {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LegacyPlan {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  content   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CelebrityProfile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReferralCode {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Referral {
+  id             String   @id @default(uuid())
+  referrerId     String
+  referrer       User     @relation("Referrer", fields: [referrerId], references: [id])
+  referredUserId String
+  referredUser   User     @relation("ReferredUser", fields: [referredUserId], references: [id])
+  status         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model ReferralReward {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  amount    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReferralMilestone {
+  id        String   @id @default(uuid())
+  name      String
+  threshold Int
+  reward    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MergerSuggestion {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContentWatermark {
+  id        String   @id @default(uuid())
+  contentId String
+  watermark String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeadMansSwitch {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  status       String
+  verifierName String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model DeathVerification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PosthumousContent {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  contentType String?
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FinalChapter {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -6,8 +6,10 @@
     "express-rate-limit": "^8.2.1"
   },
   "devDependencies": {
+    "@prisma/client": "^6.19.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
-    "@types/node": "^24.10.1"
+    "@types/node": "^24.10.1",
+    "prisma": "^6.19.0"
   }
 }
