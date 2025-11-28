@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: lifeline-db
+    environment:
+      POSTGRES_USER: lifeline
+      POSTGRES_PASSWORD: lifeline_dev
+      POSTGRES_DB: lifeline
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lifeline"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lifeline-backend
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://lifeline:lifeline_dev@postgres:5432/lifeline
+      JWT_SECRET: dev-jwt-secret-min-32-characters-long
+      JWT_REFRESH_SECRET: dev-refresh-secret-min-32-characters-long
+      EMAIL_HOST: smtp.gmail.com
+      EMAIL_PORT: 587
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      EMAIL_FROM: noreply@lifeline.com
+      FRONTEND_URL: http://localhost:8081
+      ENCRYPTION_KEY: dev-encryption-key-32-bytes-long
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npx prisma migrate deploy && npm start"
+
+  # Redis (for caching/sessions)
+  redis:
+    image: redis:7-alpine
+    container_name: lifeline-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:

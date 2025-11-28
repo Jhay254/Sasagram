@@ -1,0 +1,110 @@
+// Memory Graph - Connection Detection Types
+enum ConnectionType {
+  TEMPORAL_OVERLAP    // Same time, different places
+  SPATIAL_OVERLAP     // Same place, close time
+  MUTUAL_MENTION      // Tagged together
+  DIRECT_INTERACTION  // Messaged, tagged by each other
+  INFERRED           // Algorithm-detected pattern
+}
+
+// User connections based on shared experiences
+model UserConnection {
+  id              String   @id @default(uuid())
+  userAId         String
+  userA           User     @relation("ConnectionsA", fields: [userAId], references: [id], onDelete: Cascade)
+  
+  userBId         String
+  userB           User     @relation("ConnectionsB", fields: [userBId], references: [id], onDelete: Cascade)
+  
+  // Connection metadata
+  connectionTypes ConnectionType[]
+  strength        Float    @default(0)  // 0-100 score
+  
+  // Shared experiences
+  sharedEventCount Int     @default(0)
+  firstSharedEvent DateTime?
+  lastSharedEvent  DateTime?
+  
+  // Status
+  confirmed       Boolean  @default(false)  // Both users aware
+  hidden          Boolean  @default(false)   // Either user hid connection
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relationships
+  sharedEvents    SharedEvent[]
+  
+  @@unique([userAId, userBId])
+  @@index([userAId])
+  @@index([userBId])
+  @@index([strength])
+  @@map("user_connections")
+}
+
+// Shared events between two users
+model SharedEvent {
+  id              String         @id @default(uuid())
+  connectionId    String
+  connection      UserConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  
+  // Event details
+  eventType       ConnectionType
+  title           String?
+  description     String?
+  
+  // Temporal
+  eventDate       DateTime
+  duration        Int?  // Hours
+  
+  // Spatial
+  location        String?
+  latitude        Float?
+  longitude       Float?
+  
+  // Source data
+  userASourceType String?  // INSTAGRAM, TWITTER, EMAIL
+  userASourceId   String?
+  userBSourceType String?
+  userBSourceId   String?
+  
+  // Metadata
+  metadata        Json?    // Photos, posts, emails
+  confidence      Float    @default(0)  // 0-1 confidence score
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([connectionId])
+  @@index([eventDate])
+  @@map("shared_events")
+}
+
+// Memory collisions for notifications and viral growth
+model MemoryCollision {
+  id              String   @id @default(uuid())
+  connectionId    String?
+  
+  // Users involved
+  initiatorId     String
+  initiator       User     @relation(fields: [initiatorId], references: [id], onDelete: Cascade)
+  targetId        String?  // User ID if on platform
+  targetEmail     String?  // Email if not on platform yet
+  targetName      String?
+  
+  // Collision details
+  sharedEventId   String?
+  eventSummary    String?
+  
+  // Status
+  status          String   @default("PENDING")  // PENDING, VIEWED, ACCEPTED, IGNORED
+  notificationSent Boolean @default(false)
+  invitationSent  Boolean @default(false)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([initiatorId])
+  @@index([targetEmail])
+  @@index([status])
+  @@map("memory_collisions")
+}

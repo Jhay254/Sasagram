@@ -1,0 +1,83 @@
+// "I Was There" Tagging System
+
+enum TagStatus {
+  PENDING      // Awaiting verification
+  VERIFIED     // User confirmed presence
+  DECLINED     // User disputes tag
+  IGNORED      // No response after 30 days
+}
+
+// Event tags for collaborative verification
+model EventTag {
+  id              String    @id @default(uuid())
+  
+  // What's being tagged
+  biographyEventId String?
+  biographyEvent   BiographyEvent? @relation(fields: [biographyEventId], references: [id], onDelete: Cascade)
+  chapterId       String?
+  chapter         Chapter?  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  
+  // Who tagged whom
+  taggerId        String
+  tagger          User      @relation("TagsCreated", fields: [taggerId], references: [id], onDelete: Cascade)
+  
+  taggedUserId    String?   // If user exists on platform
+  taggedUser      User?     @relation("TagsReceived", fields: [taggedUserId], references: [id], onDelete: SetNull)
+  taggedEmail     String?   // If not on platform yet
+  taggedName      String?
+  
+  // Tag details
+  message         String?   // "We were at this concert together!"
+  status          TagStatus @default(PENDING)
+  
+  // Verification
+  verifiedAt      DateTime?
+  declinedAt      DateTime?
+  declineReason   String?
+  
+  // Perspective added by tagged user
+  perspective     TagPerspective?
+  
+  // Invitation tracking
+  invitationSent  Boolean   @default(false)
+  reminderSent    Boolean   @default(false)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@index([taggerId])
+  @@index([taggedUserId])
+  @@index([taggedEmail])
+  @@index([status])
+  @@index([biographyEventId])
+  @@index([chapterId])
+  @@map("event_tags")
+}
+
+// Perspective added by tagged users
+model TagPerspective {
+  id              String    @id @default(uuid())
+  tagId           String    @unique
+  tag             EventTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  // Added content
+  text            String?   // "I remember this! Here's my side of the story..."
+  photoUrls       String[]  // Photos from tagged user's perspective
+  audioUrl        String?   // Audio note/story
+  videoUrl        String?   // Video from that event
+  
+  // Metadata
+  visibility      String    @default("PUBLIC")  // PUBLIC, PRIVATE, FRIENDS_ONLY
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("tag_perspectives")
+}
+
+// Extend BiographyEvent model with:
+// tags            EventTag[]
+// verificationCount Int @default(0)
+
+// Extend Chapter model with:
+// tags            EventTag[]

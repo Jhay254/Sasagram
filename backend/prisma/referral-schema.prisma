@@ -1,0 +1,127 @@
+// Referral Program Schema
+
+enum ReferralStatus {
+  PENDING       // Clicked link, not signed up yet
+  SIGNED_UP     // Created account
+  ACTIVATED     // Verified email
+  CONVERTED     // Made first payment (if applicable)
+}
+
+// Referral codes for each user
+model ReferralCode {
+  id              String    @id @default(uuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  code            String    @unique  // e.g., "ALICE-X3K9"
+  
+  // Tracking metrics
+  clicks          Int       @default(0)
+  signups         Int       @default(0)
+  conversions     Int       @default(0)
+  
+  // Rewards earned from referrals
+  totalRewards    Float     @default(0)
+  pendingRewards  Float     @default(0)
+  paidRewards     Float     @default(0)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relationships
+  referrals       Referral[]
+  
+  @@index([code])
+  @@map("referral_codes")
+}
+
+// Individual referral tracking
+model Referral {
+  id              String         @id @default(uuid())
+  
+  // Who referred whom
+  referrerId      String
+  referrer        User           @relation("ReferralsGiven", fields: [referrerId], references: [id], onDelete: Cascade)
+  referralCodeId  String
+  referralCode    ReferralCode   @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
+  
+  refereeId       String?        // null until they sign up
+  referee         User?          @relation("ReferralsReceived", fields: [refereeId], references: [id], onDelete: SetNull)
+  refereeEmail    String?
+  
+  // Status tracking
+  status          ReferralStatus @default(PENDING)
+  clickedAt       DateTime       @default(now())
+  signedUpAt      DateTime?
+  activatedAt     DateTime?
+  convertedAt     DateTime?
+  
+  // Attribution metadata
+  sourceUrl       String?
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+  ipAddress       String?
+  userAgent       String?
+  
+  // Rewards
+  rewardsIssued   Boolean        @default(false)
+  rewardAmount    Float?
+  
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  @@index([referrerId])
+  @@index([refereeId])
+  @@index([referralCodeId])
+  @@index([status])
+  @@map("referrals")
+}
+
+// Rewards issued to users
+model ReferralReward {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referralId      String?
+  
+  // Reward details
+  type            String    // FREE_PREMIUM, REVENUE_SHARE, MILESTONE_BONUS
+  amount          Float?    // For revenue share
+  description     String
+  
+  // Premium extension (months)
+  premiumMonths   Int?
+  
+  // Status
+  status          String    @default("PENDING")  // PENDING, ISSUED, CLAIMED
+  issuedAt        DateTime?
+  claimedAt       DateTime?
+  expiresAt       DateTime?
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([status])
+  @@map("referral_rewards")
+}
+
+// Milestone achievements
+model ReferralMilestone {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Milestone details
+  milestone       Int       // 5, 10, 50, 100
+  rewardType      String    // TEMPLATE, BADGE, FREE_PREMIUM, REVENUE_BOOST
+  rewardValue     String?   // Template ID, badge name, etc.
+  
+  achievedAt      DateTime  @default(now())
+  claimed         Boolean   @default(false)
+  claimedAt       DateTime?
+  
+  @@index([userId])
+  @@index([milestone])
+  @@map("referral_milestones")
+}

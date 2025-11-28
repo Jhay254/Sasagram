@@ -1,0 +1,47 @@
+{
+    "expo": {
+        "scheme": "lifeline",
+        "android": {
+            "intentFilters": [
+                {
+                    "action": "VIEW",
+                    "autoVerify": true,
+                    "data": [
+                        {
+                            "scheme": "https",
+                            "host": "lifeline.app",
+                            "pathPrefix": "/biography"
+                        },
+                        {
+                            "scheme": "https",
+                            "host": "lifeline.app",
+                            "pathPrefix": "/profile"
+                        }
+                    ],
+                    "category": [
+                        "BROWSABLE",
+                        "DEFAULT"
+                    ]
+                },
+                {
+                    "action": "VIEW",
+                    "data": [
+                        {
+                            "scheme": "lifeline"
+                        }
+                    ],
+                    "category": [
+                        "BROWSABLE",
+                        "DEFAULT"
+                    ]
+                }
+            ]
+        },
+        "ios": {
+            "associatedDomains": [
+                "applinks:lifeline.app"
+            ],
+            "bundleIdentifier": "com.lifeline.app"
+        }
+    }
+}
