@@ -10,6 +10,17 @@
 **Team Size**: 2-3 engineers + 1 AI/ML specialist  
 **Budget**: $15k-25k (API costs + compute)
 
+## ⚠️ Status & Pending Items (Updated Nov 30)
+
+### Critical Pending Items
+- [ ] **OpenAI API Payment**: API key is configured but requires credit purchase (min $5) to activate.
+- [ ] **Quota Verification**: Re-run `src/test-prerequisites.ts` after payment to confirm access.
+
+### Assumptions for Development
+- We are proceeding with development assuming the API key will be active by the time we run integration tests.
+- Redis is verified and running.
+- Google Cloud Vision is deferred to Phase 2.
+
 ---
 
 ## 🎯 Success Criteria
