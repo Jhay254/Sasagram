@@ -92,7 +92,7 @@ export class ContentAccessService {
 
             // Filter accessible chapters
             const accessibleChapterIds = chapterIds.filter((chapterId) => {
-                const access = accessLevels.find((a) => a.chapterId === chapterId);
+                const access = accessLevels.find((a: any) => a.chapterId === chapterId);
                 if (!access) return true; // Default to public
 
                 const levelMap: Record<string, number> = {
