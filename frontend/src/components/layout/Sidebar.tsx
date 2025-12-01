@@ -12,7 +12,8 @@ import {
     Settings,
     LogOut,
     TrendingUp,
-    Network
+    Network,
+    Tag
 } from 'lucide-react';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
@@ -44,6 +45,12 @@ export function Sidebar({ className }: SidebarProps) {
             icon: Network,
             href: '/memory-graph',
             active: pathname === '/memory-graph',
+        },
+        {
+            label: 'Tags',
+            icon: Tag,
+            href: '/tags',
+            active: pathname === '/tags',
         },
         {
             label: 'Monetization',
