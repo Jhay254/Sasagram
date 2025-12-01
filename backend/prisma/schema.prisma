@@ -28,6 +28,13 @@ model User {
   creatorSubscriptions Subscription[]    @relation("CreatorSubscriptions")
   payouts             Payout[]
 
+  // Network Effects (Phase 2.1)
+  connectionsAsA     Connection[] @relation("ConnectionsAsA")
+  connectionsAsB     Connection[] @relation("ConnectionsAsB")
+  tagsMade           EventTag[]   @relation("Tagger")
+  tagsReceived       EventTag[]   @relation("Tagged")
+  memoryCompleteness Float        @default(0) // 0-100 score
+
   @@index([createdAt])
   @@index([email, createdAt])
 }
@@ -276,4 +283,126 @@ model ContentAccess {
   
   @@index([creatorId])
   @@index([accessLevel])
+}
+
+// ============================================
+// NETWORK EFFECTS MODELS (Phase 2.1)
+// ============================================
+
+model Connection {
+  id              String   @id @default(uuid())
+  userAId         String
+  userBId         String
+  userA           User     @relation("ConnectionsAsA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB           User     @relation("ConnectionsAsB", fields: [userBId], references: [id], onDelete: Cascade)
+  
+  strengthScore   Float    @default(0) // 0-100 based on shared experiences
+  relationshipType String? // friend, family, colleague, romantic
+  
+  // Relationship timeline
+  startDate       DateTime?
+  endDate         DateTime?
+  timeline        String?  // JSON: [{ date, event, strength }]
+  
+  // Metadata
+  sharedEvents    Int      @default(0) // Count of shared BiographyEvents
+  mutualFriends   Int      @default(0)
+  lastInteraction DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([userAId, userBId])
+  @@index([userAId])
+  @@index([userBId])
+  @@index([strengthScore])
+}
+
+model MemoryCollision {
+  id          String   @id @default(uuid())
+  
+  // Event details
+  title       String
+  description String?
+  location    String?
+  timestamp   DateTime
+  
+  // Participants
+  users       String   // JSON array of user IDs
+  
+  // AI Analysis
+  confidence  Float    // 0-100 AI confidence in match
+  verified    Boolean  @default(false)
+  perspectives String? // JSON: { userId: { text, photos, mood } }
+  
+  // Collision source
+  detectedBy  String   // temporal, spatial, mutual_mention
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([timestamp])
+  @@index([verified])
+}
+
+model EventTag {
+  id            String   @id @default(uuid())
+  
+  // Event reference
+  eventId       String
+  eventTitle    String
+  eventDate     DateTime
+  
+  // Tag relationship
+  taggerId      String
+  tagger        User     @relation("Tagger", fields: [taggerId], references: [id], onDelete: Cascade)
+  taggedUserId  String
+  taggedUser    User     @relation("Tagged", fields: [taggedUserId], references: [id], onDelete: Cascade)
+  
+  // Tag data
+  status        String   @default("pending") // pending, accepted, declined
+  message       String?  // "You were there!"
+  taggedUserPerspective String? // Their version of the event
+  
+  // Verification
+  verifiedAt    DateTime?
+  verificationData String? // JSON: { photos: [], details: "" }
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([taggedUserId, status])
+  @@index([taggerId])
+  @@index([status])
+}
+
+model StoryMerger {
+  id              String   @id @default(uuid())
+  
+  // Event details
+  eventId         String
+  eventTitle      String
+  eventDate       DateTime
+  
+  // Participants
+  participants    String   // JSON array of user IDs
+  
+  // Content
+  mergedContent   String   // JSON: { userId: narrative, photos, mood }
+  
+  // Monetization
+  isPublished     Boolean  @default(false)
+  price           Float?   // If selling merged chapter
+  revenueShare    String?  // JSON: { userId: percentage }
+  salesCount      Int      @default(0)
+  
+  // Approval
+  approvalStatus  String   // JSON: { userId: "pending"/"approved"/"declined" }
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  publishedAt     DateTime?
+  
+  @@index([isPublished])
+  @@index([eventDate])
 }

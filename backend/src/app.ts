@@ -9,6 +9,7 @@ import { globalLimiter, authLimiter, oauthLimiter, mediaLimiter } from './middle
 import authRoutes from './routes/auth.routes';
 import oauthRoutes from './routes/oauth.routes';
 import mediaRoutes from './routes/media.routes';
+import networkRoutes from './routes/network.routes';
 import Logger from './utils/logger';
 
 const app = express();
@@ -53,6 +54,7 @@ app.use(globalLimiter);
 app.use('/auth', authLimiter, authRoutes);
 app.use('/auth', oauthLimiter, oauthRoutes);
 app.use('/media', mediaLimiter, mediaRoutes);
+app.use('/api/network', networkRoutes); // Phase 2.1: Network Effects
 
 // Health Check
 app.get('/health', (req: Request, res: Response) => {

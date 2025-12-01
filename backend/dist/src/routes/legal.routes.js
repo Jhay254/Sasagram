@@ -1,0 +1,109 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const router = (0, express_1.Router)();
+const privacyPolicy = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Privacy Policy - Lifeline</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
+        h1 { color: #2c3e50; }
+        h2 { color: #34495e; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h1>Privacy Policy</h1>
+    <p>Last updated: November 29, 2025</p>
+    
+    <p>Lifeline ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how your personal information is collected, used, and disclosed by Lifeline.</p>
+
+    <h2>1. Information We Collect</h2>
+    <p>We collect information you provide directly to us, such as when you create an account, connect social media profiles, or contact us for support.</p>
+    <ul>
+        <li><strong>Account Information:</strong> Name, email address, and password.</li>
+        <li><strong>Social Media Data:</strong> When you connect accounts (Instagram, Twitter, Facebook, LinkedIn), we collect profile information and content (posts, photos) to generate your biography.</li>
+    </ul>
+
+    <h2>2. How We Use Your Information</h2>
+    <p>We use the information we collect to:</p>
+    <ul>
+        <li>Provide, maintain, and improve our services.</li>
+        <li>Generate your personal digital biography.</li>
+        <li>Send you technical notices and support messages.</li>
+    </ul>
+
+    <h2>3. Data Sharing</h2>
+    <p>We do not share your personal information with third parties except as described in this policy or with your consent.</p>
+
+    <h2>4. Contact Us</h2>
+    <p>If you have any questions about this Privacy Policy, please contact us at support@lifeline.com.</p>
+</body>
+</html>
+`;
+const dataDeletion = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Deletion Instructions - Lifeline</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
+        h1 { color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <h1>User Data Deletion Instructions</h1>
+    <p>In accordance with Facebook Platform rules, we provide a way for users to request deletion of their data.</p>
+    
+    <p>If you wish to delete your data from Lifeline, you can do so by following these steps:</p>
+    <ol>
+        <li>Log in to your Lifeline account.</li>
+        <li>Go to <strong>Settings</strong> > <strong>Account</strong>.</li>
+        <li>Click on <strong>"Delete Account"</strong>.</li>
+        <li>Confirm your choice.</li>
+    </ol>
+    
+    <p>Alternatively, you can contact us at <strong>support@lifeline.com</strong> with the subject line "Data Deletion Request", and we will process your request within 30 days.</p>
+</body>
+</html>
+`;
+router.get('/privacy', (req, res) => {
+    res.send(privacyPolicy);
+});
+router.get('/data-deletion', (req, res) => {
+    res.send(dataDeletion);
+});
+// Meta Data Deletion Callback
+// Meta sends a POST request here when a user removes the app
+router.post('/data-deletion-callback', (req, res) => {
+    try {
+        // In a real app, we would verify the 'signed_request' parameter here
+        // const signedRequest = req.body.signed_request;
+        // Generate a confirmation code
+        const confirmationCode = 'del_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        // Return the JSON response Meta expects
+        res.json({
+            url: `${process.env.BASE_URL || 'http://localhost:3000'}/data-deletion-status?code=${confirmationCode}`,
+            confirmation_code: confirmationCode,
+        });
+    }
+    catch (error) {
+        console.error('Data deletion callback error:', error);
+        res.status(500).json({ error: 'Failed to process deletion request' });
+    }
+});
+router.get('/data-deletion-status', (req, res) => {
+    const { code } = req.query;
+    res.send(`
+        <html>
+            <body>
+                <h1>Data Deletion Status</h1>
+                <p>Confirmation Code: ${code}</p>
+                <p>Status: <strong>Completed</strong></p>
+                <p>Your data has been scheduled for deletion.</p>
+            </body>
+        </html>
+    `);
+});
+exports.default = router;
