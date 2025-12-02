@@ -97,7 +97,6 @@ export class NarrativeService {
                 title: chapter.title,
                 narrative,
                 wordCount,
-                mediaMatches: [], // Will be filled later
             };
         } catch (error) {
             logger.error(`Error generating chapter narrative for ${chapter.id}:`, error);
@@ -107,7 +106,6 @@ export class NarrativeService {
                 title: chapter.title,
                 narrative: this.generateFallbackNarrative(chapter, events),
                 wordCount: 100,
-                mediaMatches: [],
             };
         }
     }

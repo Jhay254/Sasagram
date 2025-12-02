@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
-import { cacheService, CacheKeys } from '../config/redis';
-import { logAIOperation, logAIError, logAICost } from '../utils/logger';
+import { cacheService, CacheKeys } from '../../config/redis';
+import { logAIOperation, logAIError, logAICost } from '../../utils/logger';
 import crypto from 'crypto';
 
 /**

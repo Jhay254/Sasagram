@@ -73,7 +73,6 @@ class NarrativeService {
                 title: chapter.title,
                 narrative,
                 wordCount,
-                mediaMatches: [], // Will be filled later
             };
         }
         catch (error) {
@@ -84,7 +83,6 @@ class NarrativeService {
                 title: chapter.title,
                 narrative: this.generateFallbackNarrative(chapter, events),
                 wordCount: 100,
-                mediaMatches: [],
             };
         }
     }

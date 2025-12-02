@@ -12,6 +12,11 @@ import mediaRoutes from './routes/media.routes';
 import networkRoutes from './routes/network.routes';
 import taggingRoutes from './routes/tagging.routes';
 import mergerRoutes from './routes/merger.routes';
+import engagementRoutes from './routes/engagement.routes';
+import rewindRoutes from './routes/rewind.routes';
+import gamificationRoutes from './routes/gamification.routes';
+import referralRoutes from './routes/referral.routes';
+import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 import Logger from './utils/logger';
 
 const app = express();
@@ -53,22 +58,26 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 app.use(globalLimiter);
 
 // Routes
-app.use('/auth', authLimiter, authRoutes);
+app.use('/auth', authLimiter, authRoutes); // Phase 1: Authentication
 app.use('/auth', oauthLimiter, oauthRoutes);
 app.use('/media', mediaLimiter, mediaRoutes);
 app.use('/api/network', networkRoutes); // Phase 2.1: Network Effects
 app.use('/api/tags', taggingRoutes); // Phase 2.1: Tagging System
 app.use('/api/mergers', mergerRoutes); // Phase 2.1: Story Mergers
+app.use('/api/engagement', engagementRoutes); // Phase 2.2: Engagement & Retention
+app.use('/api/rewind', rewindRoutes); // Phase 2.2: Rewind Feature
+app.use('/api/gamification', gamificationRoutes); // Phase 2.3: Gamification
+app.use('/api/referral', referralRoutes); // Phase 2.3: Referrals
 
 // Health Check
 app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Global Error Handler
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    Logger.error(err.stack || err.message);
-    res.status(500).json({ error: 'Something went wrong!' });
-});
+// 404 Handler - must be after all routes
+app.use(notFoundHandler);
+
+// Global Error Handler - must be last
+app.use(errorHandler);
 
 export default app;

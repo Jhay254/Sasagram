@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -34,6 +34,16 @@ model User {
   tagsMade           EventTag[]   @relation("Tagger")
   tagsReceived       EventTag[]   @relation("Tagged")
   memoryCompleteness Float        @default(0) // 0-100 score
+
+  // Engagement (Phase 2.2)
+  livingChapters     LivingChapter[]
+  feedEntries        LivingFeedEntry[]
+
+  // Gamification (Phase 2.3)
+  achievements       UserAchievement[]
+  referralCode       ReferralCode?
+  referralsMade      Referral[]   @relation("Referrer")
+  referralReceived   Referral?    @relation("Referred")
 
   @@index([createdAt])
   @@index([email, createdAt])
@@ -405,4 +415,127 @@ model StoryMerger {
   
   @@index([isPublished])
   @@index([eventDate])
+}
+
+// ============================================
+// ENGAGEMENT & RETENTION MODELS (Phase 2.2)
+// ============================================
+
+model LivingChapter {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title           String
+  content         String? // Summary or intro
+  status          String   @default("active") // draft, active, completed
+  
+  startDate       DateTime
+  endDate         DateTime?
+  
+  // Auto-detection
+  completionTrigger String? // job_change, move, relationship_milestone
+  
+  // Engagement
+  subscriberCount Int      @default(0)
+  viewCount       Int      @default(0)
+  
+  // Feed entries in this chapter
+  entries         LivingFeedEntry[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId, status])
+}
+
+model LivingFeedEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  content   String
+  mood      String?
+  location  String?
+  mediaUrls String   // JSON array of URLs
+  
+  isPublic  Boolean  @default(true)
+  timestamp DateTime @default(now())
+  
+  // Relations
+  chapterId String?
+  chapter   LivingChapter? @relation(fields: [chapterId], references: [id])
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, timestamp])
+}
+
+// ============================================
+// GAMIFICATION & VIRAL LOOPS (Phase 2.3)
+// ============================================
+
+model Achievement {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  icon        String   // URL or icon name
+  points      Int      @default(10)
+  category    String   // "social", "content", "streak", "legacy"
+  
+  // Criteria
+  triggerType String   // "post_count", "streak_days", "referral_count"
+  threshold   Int      
+  
+  userAchievements UserAchievement[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  unlockedAt    DateTime    @default(now())
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+model ReferralCode {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  usageCount  Int      @default(0)
+  
+  referrals   Referral[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Referral {
+  id              String       @id @default(uuid())
+  referralCodeId  String
+  referralCode    ReferralCode @relation(fields: [referralCodeId], references: [id])
+  
+  referrerId      String
+  referrer        User         @relation("Referrer", fields: [referrerId], references: [id])
+  
+  referredUserId  String       @unique
+  referredUser    User         @relation("Referred", fields: [referredUserId], references: [id])
+  
+  status          String       @default("pending") // pending, completed
+  rewardClaimed   Boolean      @default(false)
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  @@index([referrerId])
 }

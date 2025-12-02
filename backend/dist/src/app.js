@@ -15,6 +15,12 @@ const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const oauth_routes_1 = __importDefault(require("./routes/oauth.routes"));
 const media_routes_1 = __importDefault(require("./routes/media.routes"));
 const network_routes_1 = __importDefault(require("./routes/network.routes"));
+const tagging_routes_1 = __importDefault(require("./routes/tagging.routes"));
+const merger_routes_1 = __importDefault(require("./routes/merger.routes"));
+const engagement_routes_1 = __importDefault(require("./routes/engagement.routes"));
+const rewind_routes_1 = __importDefault(require("./routes/rewind.routes"));
+const gamification_routes_1 = __importDefault(require("./routes/gamification.routes"));
+const referral_routes_1 = __importDefault(require("./routes/referral.routes"));
 const logger_1 = __importDefault(require("./utils/logger"));
 const app = (0, express_1.default)();
 // Security middleware
@@ -47,10 +53,16 @@ app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.de
 // Apply global rate limiter to all requests
 app.use(rate_limit_middleware_1.globalLimiter);
 // Routes
-app.use('/auth', rate_limit_middleware_1.authLimiter, auth_routes_1.default);
+app.use('/auth', rate_limit_middleware_1.authLimiter, auth_routes_1.default); // Phase 1: Authentication
 app.use('/auth', rate_limit_middleware_1.oauthLimiter, oauth_routes_1.default);
 app.use('/media', rate_limit_middleware_1.mediaLimiter, media_routes_1.default);
 app.use('/api/network', network_routes_1.default); // Phase 2.1: Network Effects
+app.use('/api/tags', tagging_routes_1.default); // Phase 2.1: Tagging System
+app.use('/api/mergers', merger_routes_1.default); // Phase 2.1: Story Mergers
+app.use('/api/engagement', engagement_routes_1.default); // Phase 2.2: Engagement & Retention
+app.use('/api/rewind', rewind_routes_1.default); // Phase 2.2: Rewind Feature
+app.use('/api/gamification', gamification_routes_1.default); // Phase 2.3: Gamification
+app.use('/api/referral', referral_routes_1.default); // Phase 2.3: Referrals
 // Health Check
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });

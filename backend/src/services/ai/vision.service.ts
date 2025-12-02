@@ -1,4 +1,4 @@
-import vision from '@google-cloud/vision';
+import { ImageAnnotatorClient } from '@google-cloud/vision';
 import { cacheService, CacheKeys } from '../../config/redis';
 import { logAIOperation, logAIError } from '../../utils/logger';
 import path from 'path';
@@ -10,12 +10,12 @@ import fs from 'fs';
  */
 
 // Initialize Vision API client
-let visionClient: vision.ImageAnnotatorClient | null = null;
+let visionClient: ImageAnnotatorClient | null = null;
 
 /**
  * Initialize the Vision API client
  */
-const initializeClient = (): vision.ImageAnnotatorClient => {
+const initializeClient = (): ImageAnnotatorClient => {
     if (visionClient) return visionClient;
 
     const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
@@ -28,7 +28,7 @@ const initializeClient = (): vision.ImageAnnotatorClient => {
         throw new Error(`Google Cloud credentials file not found: ${credentialsPath}`);
     }
 
-    visionClient = new vision.ImageAnnotatorClient({
+    visionClient = new ImageAnnotatorClient({
         keyFilename: credentialsPath,
     });
 

@@ -1,0 +1,25 @@
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-01 02:03:11"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-01 06:53:23"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-01 06:59:14"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-01 07:02:36"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-01 07:03:05"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-01 08:37:37"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-01 08:37:48"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-01 12:55:46"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-01 12:55:46"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-01 12:55:46"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-01 12:55:47"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-01 14:17:56"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-01 14:19:29"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-01 14:21:15"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-01 14:30:06"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-01 19:19:32"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-01 19:19:32"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-01 19:19:32"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-01 19:19:32"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-01 19:19:32"}
+{"level":"info","message":"Adding test email job...","timestamp":"2025-12-01 19:19:32"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-01 19:19:32"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-01 19:19:32"}
+{"level":"info","message":"Job added: 1 (test-email) to queue email-notification","timestamp":"2025-12-01 19:19:33"}
+{"level":"info","message":"Job added successfully.","timestamp":"2025-12-01 19:19:33"}

@@ -1,0 +1,5 @@
+src/middleware/validation.middleware.ts(54,18): error TS2339: Property 'file' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/middleware/validation.middleware.ts(54,31): error TS2339: Property 'files' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/middleware/validation.middleware.ts(58,26): error TS2339: Property 'file' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/middleware/validation.middleware.ts(58,53): error TS2339: Property 'files' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/middleware/validation.middleware.ts(58,66): error TS2339: Property 'files' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.

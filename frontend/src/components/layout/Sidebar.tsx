@@ -14,7 +14,8 @@ import {
     TrendingUp,
     Network,
     Tag,
-    Merge
+    Merge,
+    Trophy
 } from 'lucide-react';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
@@ -58,6 +59,12 @@ export function Sidebar({ className }: SidebarProps) {
             icon: Merge,
             href: '/mergers',
             active: pathname === '/mergers',
+        },
+        {
+            label: 'Achievements',
+            icon: Trophy,
+            href: '/achievements',
+            active: pathname === '/achievements',
         },
         {
             label: 'Monetization',

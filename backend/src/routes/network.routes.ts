@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { PrismaClient } from '@prisma/client';
 import { collisionDetectionService } from '../services/network/collision-detection.service';
 import { connectionService } from '../services/network/connection.service';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';

@@ -1,14 +1,22 @@
 import Redis from 'ioredis';
 
-const redis = new Redis({
-    host: 'localhost',
-    port: 6379,
-});
+async function main() {
+    console.log('Testing Redis connection...');
+    try {
+        const redis = new Redis({
+            host: '127.0.0.1',
+            port: 6379,
+            maxRetriesPerRequest: 1
+        });
 
-redis.ping().then((result) => {
-    console.log('Redis PING:', result);
-    redis.quit();
-}).catch((err) => {
-    console.error('Redis Error:', err);
-    process.exit(1);
-});
+        console.log('Connecting...');
+        const result = await redis.ping();
+        console.log('PING result:', result);
+
+        await redis.quit();
+    } catch (error) {
+        console.error('Redis connection failed:', error);
+    }
+}
+
+main();

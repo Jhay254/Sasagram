@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import Joi from 'joi';
+import * as Joi from 'joi';
 import Logger from '../utils/logger';
 
 /**
@@ -7,7 +7,7 @@ import Logger from '../utils/logger';
  * @param schema - Joi schema to validate against
  * @param property - Request property to validate ('body', 'query', 'params')
  */
-export const validate = (schema: Joi.ObjectSchema, property: 'body' | 'query' | 'params' = 'body') => {
+export const validate = (schema: Joi.Schema, property: 'body' | 'query' | 'params' = 'body') => {
     return (req: Request, res: Response, next: NextFunction) => {
         const { error, value } = schema.validate(req[property], {
             abortEarly: false, // Return all errors, not just the first one
@@ -51,11 +51,11 @@ export const validateFileUpload = (
     maxSize: number // in bytes
 ) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        if (!req.file && !req.files) {
+        if (!(req as any).file && !(req as any).files) {
             return next();
         }
 
-        const file = req.file || (Array.isArray(req.files) ? req.files[0] : null);
+        const file = (req as any).file || (Array.isArray((req as any).files) ? (req as any).files[0] : null);
 
         if (!file) {
             return next();

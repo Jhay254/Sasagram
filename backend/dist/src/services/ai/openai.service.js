@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.testConnection = exports.isConfigured = exports.streamChatCompletion = exports.batchGenerate = exports.estimateTokens = exports.generateEmbedding = exports.generateText = exports.chatCompletion = void 0;
 const openai_1 = __importDefault(require("openai"));
-const redis_1 = require("../config/redis");
-const logger_1 = require("../utils/logger");
+const redis_1 = require("../../config/redis");
+const logger_1 = require("../../utils/logger");
 const crypto_1 = __importDefault(require("crypto"));
 /**
  * OpenAI Service

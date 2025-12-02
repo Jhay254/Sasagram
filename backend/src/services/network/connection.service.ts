@@ -92,7 +92,7 @@ export class ConnectionService {
 
         // Format for graph visualization
         const nodes = new Map();
-        const edges = [];
+        const edges: any[] = [];
 
         connections.forEach(conn => {
             // Add nodes

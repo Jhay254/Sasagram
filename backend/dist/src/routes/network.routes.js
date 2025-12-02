@@ -15,9 +15,9 @@ const prisma = new client_1.PrismaClient();
  * POST /api/network/detect-collisions
  * Trigger collision detection for current user
  */
-router.post('/detect-collisions', auth_middleware_1.authenticateToken, async (req, res) => {
+router.post('/detect-collisions', auth_middleware_1.authenticate, async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user.id;
         await collision_detection_service_1.collisionDetectionService.detectAllCollisions(userId);
         res.json({
             success: true,
@@ -33,9 +33,9 @@ router.post('/detect-collisions', auth_middleware_1.authenticateToken, async (re
  * GET /api/network/memory-graph
  * Get user's memory graph
  */
-router.get('/memory-graph', auth_middleware_1.authenticateToken, async (req, res) => {
+router.get('/memory-graph', auth_middleware_1.authenticate, async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user.id;
         const graph = await connection_service_1.connectionService.getMemoryGraph(userId);
         res.json(graph);
     }
@@ -48,9 +48,9 @@ router.get('/memory-graph', auth_middleware_1.authenticateToken, async (req, res
  * GET /api/network/relationship/:userId
  * Get relationship timeline with another user
  */
-router.get('/relationship/:userId', auth_middleware_1.authenticateToken, async (req, res) => {
+router.get('/relationship/:userId', auth_middleware_1.authenticate, async (req, res) => {
     try {
-        const currentUserId = req.user.userId;
+        const currentUserId = req.user.id;
         const otherUserId = req.params.userId;
         const timeline = await connection_service_1.connectionService.getRelationshipTimeline(currentUserId, otherUserId);
         res.json(timeline);
@@ -64,9 +64,9 @@ router.get('/relationship/:userId', auth_middleware_1.authenticateToken, async (
  * POST /api/network/connection
  * Manually create/strengthen connection
  */
-router.post('/connection', auth_middleware_1.authenticateToken, async (req, res) => {
+router.post('/connection', auth_middleware_1.authenticate, async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user.id;
         const { otherUserId, relationshipType } = req.body;
         const connection = await connection_service_1.connectionService.createOrUpdateConnection(userId, otherUserId, relationshipType);
         res.json(connection);
@@ -80,9 +80,9 @@ router.post('/connection', auth_middleware_1.authenticateToken, async (req, res)
  * GET /api/network/collisions
  * Get detected collisions for user
  */
-router.get('/collisions', auth_middleware_1.authenticateToken, async (req, res) => {
+router.get('/collisions', auth_middleware_1.authenticate, async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user.id;
         const allCollisions = await prisma.memoryCollision.findMany({
             orderBy: { timestamp: 'desc' },
         });

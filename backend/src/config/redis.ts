@@ -55,7 +55,10 @@ redisClient.on('reconnecting', () => {
  * BullMQ requires separate connections for queue and worker
  */
 export const createRedisConnection = (): Redis => {
-    return new Redis(redisConfig);
+    return new Redis({
+        ...redisConfig,
+        maxRetriesPerRequest: null
+    });
 };
 
 /**

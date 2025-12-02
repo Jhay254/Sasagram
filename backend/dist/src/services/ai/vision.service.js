@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.testConnection = exports.isConfigured = exports.batchAnalyzeImages = exports.analyzeImage = exports.detectText = exports.detectLandmarks = exports.detectFaces = exports.analyzeLabels = void 0;
-const vision_1 = __importDefault(require("@google-cloud/vision"));
+const vision_1 = require("@google-cloud/vision");
 const redis_1 = require("../../config/redis");
 const logger_1 = require("../../utils/logger");
 const path_1 = __importDefault(require("path"));
@@ -28,7 +28,7 @@ const initializeClient = () => {
     if (!fs_1.default.existsSync(credentialsPath)) {
         throw new Error(`Google Cloud credentials file not found: ${credentialsPath}`);
     }
-    visionClient = new vision_1.default.ImageAnnotatorClient({
+    visionClient = new vision_1.ImageAnnotatorClient({
         keyFilename: credentialsPath,
     });
     return visionClient;
