@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import logger from '../../utils/logger';
+import { notificationService } from '../notification.service';
+import { inviteService } from '../invite.service';
 
 const prisma = new PrismaClient();
 
@@ -196,15 +198,20 @@ export class TaggingService {
         email: string,
         eventData: any
     ): Promise<void> {
-        const tagger = await prisma.user.findUnique({ where: { id: taggerId } });
+        // Generate invite token
+        const inviteToken = inviteService.generateInviteToken('pending', email);
 
-        const inviteLink = `${process.env.FRONTEND_URL}/register?invite=tag&from=${taggerId}&event=${eventData.eventId}`;
+        // Send invitation email
+        await notificationService.sendInviteNotification(
+            taggerId,
+            email,
+            eventData,
+            inviteToken
+        );
 
-        // TODO: Implement email service integration
-        logger.info(`Tag invitation email would be sent to ${email}`, {
-            from: tagger?.name || tagger?.email,
+        logger.info(`Tag invitation sent to ${email}`, {
+            taggerId,
             event: eventData.eventTitle,
-            link: inviteLink,
         });
     }
 
@@ -212,23 +219,7 @@ export class TaggingService {
      * Send tag notification
      */
     private async sendTagNotification(tagId: string): Promise<void> {
-        const tag = await prisma.eventTag.findUnique({
-            where: { id: tagId },
-            include: {
-                tagger: true,
-                taggedUser: true,
-            },
-        });
-
-        if (!tag) return;
-
-        // TODO: Implement notification service (push notifications, in-app, email)
-        logger.info(`Tag notification would be sent`, {
-            tagId,
-            to: tag.taggedUser.email,
-            from: tag.tagger.name || tag.tagger.email,
-            event: tag.eventTitle,
-        });
+        await notificationService.sendTagNotification(tagId);
     }
 }
 

@@ -33,8 +33,8 @@ class StoryMergerService {
                 eventTitle: collision.title,
                 eventDate: collision.timestamp,
                 participants: JSON.stringify(participants),
-                mergedContent: JSON.stringify({}), // Empty initially
-                approvalStatus: JSON.stringify(approvalStatus),
+                mergedContent: {}, // Empty initially
+                approvalStatus: approvalStatus,
                 isPublished: false,
             },
         });
@@ -61,16 +61,16 @@ class StoryMergerService {
             throw new Error('Unauthorized');
         }
         // Update approval status
-        const approvalStatus = JSON.parse(merger.approvalStatus);
+        const approvalStatus = merger.approvalStatus;
         approvalStatus[userId] = 'approved';
         // Add perspective to merged content
-        const mergedContent = JSON.parse(merger.mergedContent || '{}');
+        const mergedContent = merger.mergedContent || {};
         mergedContent[userId] = perspective;
         const updated = await prisma.storyMerger.update({
             where: { id: mergerId },
             data: {
-                approvalStatus: JSON.stringify(approvalStatus),
-                mergedContent: JSON.stringify(mergedContent),
+                approvalStatus: approvalStatus,
+                mergedContent: mergedContent,
             },
         });
         // Check if all approved
@@ -91,7 +91,7 @@ class StoryMergerService {
             throw new Error('Merger not found');
         }
         // Verify all participants approved
-        const approvalStatus = JSON.parse(merger.approvalStatus);
+        const approvalStatus = merger.approvalStatus;
         const allApproved = Object.values(approvalStatus).every(status => status === 'approved');
         if (!allApproved) {
             throw new Error('Not all participants have approved this merger');
@@ -109,7 +109,7 @@ class StoryMergerService {
                 isPublished: true,
                 publishedAt: new Date(),
                 price,
-                revenueShare: JSON.stringify(revenueShare),
+                revenueShare: revenueShare,
             },
         });
     }
@@ -143,7 +143,7 @@ class StoryMergerService {
         // Filter mergers where user is a participant and hasn't approved
         const pendingMergers = allMergers.filter(merger => {
             const participants = JSON.parse(merger.participants);
-            const approvalStatus = JSON.parse(merger.approvalStatus);
+            const approvalStatus = merger.approvalStatus;
             return participants.includes(userId) && approvalStatus[userId] === 'pending';
         });
         return pendingMergers;
@@ -162,9 +162,9 @@ class StoryMergerService {
         return {
             ...merger,
             participants: JSON.parse(merger.participants),
-            mergedContent: JSON.parse(merger.mergedContent || '{}'),
-            approvalStatus: JSON.parse(merger.approvalStatus),
-            revenueShare: merger.revenueShare ? JSON.parse(merger.revenueShare) : null,
+            mergedContent: merger.mergedContent || {},
+            approvalStatus: merger.approvalStatus,
+            revenueShare: merger.revenueShare,
         };
     }
     /**
@@ -209,6 +209,79 @@ class StoryMergerService {
             mergedContent: undefined,
             approvalStatus: undefined,
         }));
+    }
+    /**
+     * Detect conflicts in merger narratives
+     */
+    async detectConflicts(mergerId) {
+        const merger = await this.getMergerById(mergerId);
+        const conflicts = [];
+        const participants = Object.keys(merger.mergedContent);
+        if (participants.length < 2)
+            return conflicts;
+        // Compare narratives for discrepancies
+        const narratives = participants.map(userId => ({
+            userId,
+            narrative: merger.mergedContent[userId].narrative,
+            mood: merger.mergedContent[userId].mood,
+        }));
+        // Detect mood conflicts
+        const moods = narratives.map(n => n.mood).filter(Boolean);
+        if (moods.length > 1) {
+            const uniqueMoods = [...new Set(moods)];
+            if (uniqueMoods.length > 1) {
+                conflicts.push({
+                    id: `mood-conflict-${Date.now()}`,
+                    type: 'mood',
+                    description: 'Participants remember different emotional tones',
+                    values: uniqueMoods,
+                    participants: narratives.filter(n => n.mood).map(n => n.userId),
+                });
+            }
+        }
+        // Detect narrative length discrepancies (one very short, one very long)
+        const lengths = narratives.map(n => n.narrative.length);
+        const avgLength = lengths.reduce((a, b) => a + b, 0) / lengths.length;
+        narratives.forEach((n, i) => {
+            if (n.narrative.length < avgLength * 0.3) {
+                conflicts.push({
+                    id: `detail-conflict-${i}`,
+                    type: 'detail_mismatch',
+                    description: 'One perspective lacks detail compared to others',
+                    userId: n.userId,
+                });
+            }
+        });
+        return conflicts;
+    }
+    /**
+     * Resolve conflict with chosen strategy
+     */
+    async resolveConflict(mergerId, conflictId, resolution) {
+        const merger = await this.getMergerById(mergerId);
+        // Store resolution in merger metadata
+        const resolutions = merger.resolutions || {};
+        resolutions[conflictId] = {
+            ...resolution,
+            resolvedAt: new Date(),
+        };
+        // Update merger with resolution
+        await prisma.storyMerger.update({
+            where: { id: mergerId },
+            data: {
+                // Store resolutions in revenueShare field temporarily (or add new field)
+                revenueShare: {
+                    ...(merger.revenueShare || {}),
+                    _resolutions: resolutions,
+                },
+            },
+        });
+        logger_1.default.info(`Conflict resolved`, {
+            mergerId,
+            conflictId,
+            strategy: resolution.strategy,
+        });
+        return { success: true, resolution };
     }
 }
 exports.StoryMergerService = StoryMergerService;

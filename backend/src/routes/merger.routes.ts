@@ -165,4 +165,52 @@ router.post('/:id/purchase', authenticate, async (req: AuthRequest, res) => {
     }
 });
 
+/**
+ * GET /api/mergers/:id/conflicts
+ * Detect conflicts in merger narratives
+ */
+router.get('/:id/conflicts', authenticate, async (req: AuthRequest, res) => {
+    try {
+        const { id } = req.params;
+
+        const conflicts = await storyMergerService.detectConflicts(id);
+        res.json({ conflicts });
+    } catch (error: any) {
+        logger.error('Error detecting conflicts:', error);
+        res.status(500).json({
+            error: error.message || 'Failed to detect conflicts',
+        });
+    }
+});
+
+/**
+ * POST /api/mergers/:id/conflicts/:conflictId/resolve
+ * Resolve a specific conflict
+ */
+router.post('/:id/conflicts/:conflictId/resolve', authenticate, async (req: AuthRequest, res) => {
+    try {
+        const { id, conflictId } = req.params;
+        const { strategy, selectedValue, votes } = req.body;
+
+        if (!strategy) {
+            return res.status(400).json({
+                error: 'Missing required field: strategy',
+            });
+        }
+
+        const result = await storyMergerService.resolveConflict(id, conflictId, {
+            strategy,
+            selectedValue,
+            votes,
+        });
+
+        res.json(result);
+    } catch (error: any) {
+        logger.error('Error resolving conflict:', error);
+        res.status(500).json({
+            error: error.message || 'Failed to resolve conflict',
+        });
+    }
+});
+
 export default router;

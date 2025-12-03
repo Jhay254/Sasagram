@@ -10,6 +10,36 @@ export enum NarrativeStyle {
 }
 
 /**
+ * Narrative tones for emotional quality
+ */
+export enum NarrativeTone {
+    // Emotional
+    HUMOROUS = 'humorous',
+    CYNICAL = 'cynical',
+    OPTIMISTIC = 'optimistic',
+    NOSTALGIC = 'nostalgic',
+    MELANCHOLIC = 'melancholic',
+    EMPATHETIC = 'empathetic',
+    ROMANTIC = 'romantic',
+
+    // Formal
+    FORMAL = 'formal',
+    ACADEMIC = 'academic',
+    PROFESSIONAL = 'professional',
+
+    // Casual
+    CASUAL = 'casual',
+    WITTY = 'witty',
+    SARCASTIC = 'sarcastic',
+    CONVERSATIONAL = 'conversational',
+
+    // Dramatic
+    DRAMATIC = 'dramatic',
+    SUSPENSEFUL = 'suspenseful',
+    INSPIRATIONAL = 'inspirational',
+}
+
+/**
  * Complete biography document
  */
 export interface Biography {
@@ -17,6 +47,7 @@ export interface Biography {
     userId: string;
     title: string;
     style: NarrativeStyle;
+    tone: NarrativeTone;
     chapters: BiographyChapterNarrative[];
     introduction: string;
     conclusion: string;

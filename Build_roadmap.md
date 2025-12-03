@@ -187,7 +187,14 @@ Lifeline is a monetized content platform that transforms personal digital data i
   - Conversational (default for MVP)
   - Journalistic/objective
   - Academic
+  - Conversational (default for MVP)
+  - Journalistic/objective
+  - Academic
   - Poetic/literary
+- [ ] **Narrative Tones Implementation**:
+  - Emotional (Nostalgic, Melancholic, Optimistic)
+  - Attitude (Humorous, Sarcastic, Inspirational)
+  - Formal/Casual options
 - [ ] Contextual photo/video matching
   - Match media to specific events based on timestamps
   - Location-based matching

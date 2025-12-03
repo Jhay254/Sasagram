@@ -94,6 +94,59 @@ class ChapterService {
         }
         return { detected: false };
     }
+    /**
+     * Get analytics for a specific chapter
+     */
+    async getChapterAnalytics(chapterId) {
+        // Get total entries
+        const totalEntries = await prisma.livingFeedEntry.count({
+            where: { chapterId },
+        });
+        // Get entries by day (last 7 days)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const recentEntries = await prisma.livingFeedEntry.findMany({
+            where: {
+                chapterId,
+                createdAt: { gte: sevenDaysAgo },
+            },
+            select: { createdAt: true },
+        });
+        const entriesByDayMap = new Map();
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        // Initialize last 7 days with 0
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dayName = days[d.getDay()];
+            entriesByDayMap.set(dayName, 0);
+        }
+        recentEntries.forEach(entry => {
+            const dayName = days[entry.createdAt.getDay()];
+            entriesByDayMap.set(dayName, (entriesByDayMap.get(dayName) || 0) + 1);
+        });
+        const entriesByDay = Array.from(entriesByDayMap.entries()).map(([day, count]) => ({
+            day,
+            count,
+        }));
+        // Get mood distribution
+        const moodData = await prisma.livingFeedEntry.groupBy({
+            by: ['mood'],
+            where: { chapterId },
+            _count: { mood: true },
+        });
+        const moodDistribution = moodData.map(item => ({
+            mood: item.mood,
+            count: item._count.mood,
+        })).sort((a, b) => b.count - a.count);
+        return {
+            totalEntries,
+            subscriberCount: 0, // Placeholder for Phase 2.1
+            viewCount: totalEntries * 15, // Mock view count
+            entriesByDay,
+            moodDistribution,
+        };
+    }
 }
 exports.ChapterService = ChapterService;
 exports.chapterService = new ChapterService();

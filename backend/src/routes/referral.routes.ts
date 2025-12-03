@@ -50,4 +50,34 @@ router.post('/redeem', authenticate, async (req: AuthRequest, res) => {
     }
 });
 
+/**
+ * GET /api/referral/stats
+ * Get referral statistics for the current user
+ */
+router.get('/stats', authenticate, async (req: AuthRequest, res) => {
+    try {
+        const userId = req.user!.id;
+        const stats = await referralService.getReferralStats(userId);
+        res.json(stats);
+    } catch (error) {
+        logger.error('Error fetching referral stats:', error);
+        res.status(500).json({ error: 'Failed to fetch referral stats' });
+    }
+});
+
+/**
+ * POST /api/referral/generate
+ * Generate a referral code for the current user
+ */
+router.post('/generate', authenticate, async (req: AuthRequest, res) => {
+    try {
+        const userId = req.user!.id;
+        const code = await referralService.generateReferralCode(userId);
+        res.json({ code });
+    } catch (error) {
+        logger.error('Error generating referral code:', error);
+        res.status(500).json({ error: 'Failed to generate referral code' });
+    }
+});
+
 export default router;

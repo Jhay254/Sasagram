@@ -157,7 +157,7 @@ export class ConnectionService {
         return {
             connection,
             sharedEvents: sharedCollisions,
-            timeline: connection.timeline ? JSON.parse(connection.timeline) : [],
+            timeline: connection.timeline || [],
         };
     }
 }

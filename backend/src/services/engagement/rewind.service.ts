@@ -8,10 +8,13 @@ export class RewindService {
      * Get "On This Day" content for a user
      * Returns content from previous years on the same month/day
      */
-    async getOnThisDay(userId: string, timezoneOffset: number = 0): Promise<any[]> {
-        const today = new Date();
-        const month = today.getMonth() + 1; // 1-12
-        const day = today.getDate();
+    /**
+     * Get content for a specific date across all years
+     */
+    async getMemoryComparison(userId: string, date: Date): Promise<any[]> {
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const targetYear = date.getFullYear();
 
         try {
             const allContent = await prisma.content.findMany({
@@ -29,16 +32,16 @@ export class RewindService {
                 orderBy: { timestamp: 'desc' },
             });
 
-            const onThisDayItems: any[] = [];
+            const comparisonItems: any[] = [];
 
-            const isSameDay = (date: Date) => {
-                return date.getMonth() + 1 === month && date.getDate() === day && date.getFullYear() !== today.getFullYear();
+            const isSameDay = (d: Date) => {
+                return d.getMonth() + 1 === month && d.getDate() === day;
             };
 
             // Filter Content
             for (const item of allContent) {
                 if (isSameDay(item.timestamp)) {
-                    onThisDayItems.push({
+                    comparisonItems.push({
                         type: 'content',
                         data: item,
                         date: item.timestamp,
@@ -50,7 +53,7 @@ export class RewindService {
             // Filter Media
             for (const item of allMedia) {
                 if (item.takenAt && isSameDay(item.takenAt)) {
-                    onThisDayItems.push({
+                    comparisonItems.push({
                         type: 'media',
                         data: item,
                         date: item.takenAt,
@@ -62,7 +65,7 @@ export class RewindService {
             // Filter Feed Entries
             for (const item of allFeedEntries) {
                 if (isSameDay(item.timestamp)) {
-                    onThisDayItems.push({
+                    comparisonItems.push({
                         type: 'feed',
                         data: {
                             ...item,
@@ -74,12 +77,69 @@ export class RewindService {
                 }
             }
 
-            return onThisDayItems.sort((a, b) => b.year - a.year);
+            return comparisonItems.sort((a, b) => b.year - a.year);
 
         } catch (error) {
-            logger.error('Error fetching On This Day content:', error);
+            logger.error('Error fetching memory comparison:', error);
             throw error;
         }
+    }
+
+    /**
+     * Get "On This Day" content (wrapper for getMemoryComparison with today's date)
+     */
+    async getOnThisDay(userId: string, timezoneOffset: number = 0): Promise<any[]> {
+        return this.getMemoryComparison(userId, new Date());
+    }
+
+    /**
+     * Get main Rewind feed (mix of On This Day, Random, and Recent)
+     */
+    async getRewindFeed(userId: string, cursor?: string, limit: number = 10): Promise<any> {
+        // 1. Get On This Day (high priority)
+        const onThisDay = await this.getOnThisDay(userId);
+
+        // 2. Get some random memories
+        const randomMemories = [];
+        for (let i = 0; i < 3; i++) {
+            const mem = await this.getRandomMemory(userId);
+            if (mem) randomMemories.push({
+                type: 'memory',
+                data: mem,
+                date: mem.timestamp,
+                year: mem.timestamp.getFullYear(),
+            });
+        }
+
+        // 3. Get recent feed entries
+        const recentFeed = await prisma.livingFeedEntry.findMany({
+            where: { userId },
+            orderBy: { timestamp: 'desc' },
+            take: 5,
+        });
+
+        const recentItems = recentFeed.map(item => ({
+            type: 'feed',
+            data: {
+                ...item,
+                mediaUrls: JSON.parse(item.mediaUrls),
+            },
+            date: item.timestamp,
+            year: item.timestamp.getFullYear(),
+        }));
+
+        // Interleave content
+        const feed = [
+            ...onThisDay.slice(0, 3),
+            ...randomMemories,
+            ...recentItems,
+            ...onThisDay.slice(3),
+        ];
+
+        return {
+            items: feed,
+            nextCursor: null, // Implement real cursor logic later
+        };
     }
 
     /**

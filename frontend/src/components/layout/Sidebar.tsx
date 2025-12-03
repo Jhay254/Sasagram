@@ -15,7 +15,9 @@ import {
     Network,
     Tag,
     Merge,
-    Trophy
+    Trophy,
+    History,
+    UserPlus
 } from 'lucide-react';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
@@ -29,6 +31,12 @@ export function Sidebar({ className }: SidebarProps) {
             icon: LayoutDashboard,
             href: '/dashboard',
             active: pathname === '/dashboard',
+        },
+        {
+            label: 'Rewind',
+            icon: History,
+            href: '/rewind',
+            active: pathname === '/rewind',
         },
         {
             label: 'Editor',
@@ -71,6 +79,12 @@ export function Sidebar({ className }: SidebarProps) {
             icon: CreditCard,
             href: '/monetization',
             active: pathname === '/monetization',
+        },
+        {
+            label: 'Referrals',
+            icon: UserPlus,
+            href: '/referrals',
+            active: pathname === '/referrals',
         },
         {
             label: 'Revenue',

@@ -8,18 +8,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell } from "lucide-react";
+import { NotificationCenter } from "@/components/engagement/NotificationCenter";
 
 export function Header() {
     return (
         <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex h-14 items-center px-6 gap-4">
                 <div className="ml-auto flex items-center gap-4">
-                    <Button variant="ghost" size="icon" className="relative">
-                        <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-600" />
-                        <span className="sr-only">Notifications</span>
-                    </Button>
+                    <NotificationCenter />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>

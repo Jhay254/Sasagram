@@ -21,7 +21,12 @@ const engagement_routes_1 = __importDefault(require("./routes/engagement.routes"
 const rewind_routes_1 = __importDefault(require("./routes/rewind.routes"));
 const gamification_routes_1 = __importDefault(require("./routes/gamification.routes"));
 const referral_routes_1 = __importDefault(require("./routes/referral.routes"));
-const logger_1 = __importDefault(require("./utils/logger"));
+const invite_routes_1 = __importDefault(require("./routes/invite.routes"));
+const living_routes_1 = __importDefault(require("./routes/living.routes"));
+const viral_routes_1 = __importDefault(require("./routes/viral.routes"));
+const protection_routes_1 = __importDefault(require("./routes/protection.routes"));
+const location_routes_1 = __importDefault(require("./routes/location.routes"));
+const error_middleware_1 = require("./middleware/error.middleware");
 const app = (0, express_1.default)();
 // Security middleware
 app.use((0, helmet_1.default)());
@@ -63,13 +68,17 @@ app.use('/api/engagement', engagement_routes_1.default); // Phase 2.2: Engagemen
 app.use('/api/rewind', rewind_routes_1.default); // Phase 2.2: Rewind Feature
 app.use('/api/gamification', gamification_routes_1.default); // Phase 2.3: Gamification
 app.use('/api/referral', referral_routes_1.default); // Phase 2.3: Referrals
+app.use('/invite', invite_routes_1.default); // Phase 2.1: Viral Landing Pages (public)
+app.use('/api/living', living_routes_1.default); // Phase 2.2: Living Chapters & AI
+app.use('/api/viral', viral_routes_1.default); // Phase 2.4: Viral Growth
+app.use('/api/protection', protection_routes_1.default); // Phase 2.6: Content Protection
+app.use('/api/location', location_routes_1.default); // Phase 2.7: Location & Context
 // Health Check
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
-// Global Error Handler
-app.use((err, req, res, next) => {
-    logger_1.default.error(err.stack || err.message);
-    res.status(500).json({ error: 'Something went wrong!' });
-});
+// 404 Handler - must be after all routes
+app.use(error_middleware_1.notFoundHandler);
+// Global Error Handler - must be last
+app.use(error_middleware_1.errorHandler);
 exports.default = app;

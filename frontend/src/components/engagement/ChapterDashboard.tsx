@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { MilestoneDetection } from './MilestoneDetection';
 
 interface Chapter {
     id: string;
@@ -118,6 +119,10 @@ export function ChapterDashboard() {
                                     <span>Ongoing</span>
                                 </div>
                                 <Progress value={65} className="h-2" />
+                            </div>
+
+                            <div className="pt-4 border-t">
+                                <MilestoneDetection onChapterComplete={loadActiveChapter} />
                             </div>
                         </div>
                     ) : (

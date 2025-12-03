@@ -52,7 +52,10 @@ exports.redisClient.on('reconnecting', () => {
  * BullMQ requires separate connections for queue and worker
  */
 const createRedisConnection = () => {
-    return new ioredis_1.default(redisConfig);
+    return new ioredis_1.default({
+        ...redisConfig,
+        maxRetriesPerRequest: null
+    });
 };
 exports.createRedisConnection = createRedisConnection;
 /**

@@ -36,8 +36,8 @@ export function LivingFeed() {
 
     const loadFeed = async () => {
         try {
-            const res = await api.get('/engagement/feed');
-            setEntries(res.data);
+            const res = await api.get('/living/feed');
+            setEntries(res.data.entries || res.data);
         } catch (error) {
             console.error('Failed to load feed:', error);
         } finally {

@@ -16,6 +16,11 @@ import engagementRoutes from './routes/engagement.routes';
 import rewindRoutes from './routes/rewind.routes';
 import gamificationRoutes from './routes/gamification.routes';
 import referralRoutes from './routes/referral.routes';
+import inviteRoutes from './routes/invite.routes';
+import livingRoutes from './routes/living.routes';
+import viralRoutes from './routes/viral.routes';
+import protectionRoutes from './routes/protection.routes';
+import locationRoutes from './routes/location.routes';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 import Logger from './utils/logger';
 
@@ -68,6 +73,11 @@ app.use('/api/engagement', engagementRoutes); // Phase 2.2: Engagement & Retenti
 app.use('/api/rewind', rewindRoutes); // Phase 2.2: Rewind Feature
 app.use('/api/gamification', gamificationRoutes); // Phase 2.3: Gamification
 app.use('/api/referral', referralRoutes); // Phase 2.3: Referrals
+app.use('/invite', inviteRoutes); // Phase 2.1: Viral Landing Pages (public)
+app.use('/api/living', livingRoutes); // Phase 2.2: Living Chapters & AI
+app.use('/api/viral', viralRoutes); // Phase 2.4: Viral Growth
+app.use('/api/protection', protectionRoutes); // Phase 2.6: Content Protection
+app.use('/api/location', locationRoutes); // Phase 2.7: Location & Context
 
 // Health Check
 app.get('/health', (req: Request, res: Response) => {

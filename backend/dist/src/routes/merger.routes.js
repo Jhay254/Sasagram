@@ -157,4 +157,48 @@ router.post('/:id/purchase', auth_middleware_1.authenticate, async (req, res) =>
         });
     }
 });
+/**
+ * GET /api/mergers/:id/conflicts
+ * Detect conflicts in merger narratives
+ */
+router.get('/:id/conflicts', auth_middleware_1.authenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const conflicts = await story_merger_service_1.storyMergerService.detectConflicts(id);
+        res.json({ conflicts });
+    }
+    catch (error) {
+        logger_1.default.error('Error detecting conflicts:', error);
+        res.status(500).json({
+            error: error.message || 'Failed to detect conflicts',
+        });
+    }
+});
+/**
+ * POST /api/mergers/:id/conflicts/:conflictId/resolve
+ * Resolve a specific conflict
+ */
+router.post('/:id/conflicts/:conflictId/resolve', auth_middleware_1.authenticate, async (req, res) => {
+    try {
+        const { id, conflictId } = req.params;
+        const { strategy, selectedValue, votes } = req.body;
+        if (!strategy) {
+            return res.status(400).json({
+                error: 'Missing required field: strategy',
+            });
+        }
+        const result = await story_merger_service_1.storyMergerService.resolveConflict(id, conflictId, {
+            strategy,
+            selectedValue,
+            votes,
+        });
+        res.json(result);
+    }
+    catch (error) {
+        logger_1.default.error('Error resolving conflict:', error);
+        res.status(500).json({
+            error: error.message || 'Failed to resolve conflict',
+        });
+    }
+});
 exports.default = router;

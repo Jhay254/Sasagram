@@ -1,0 +1,124 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.notificationService = exports.NotificationService = void 0;
+const client_1 = require("@prisma/client");
+const logger_1 = __importDefault(require("../../utils/logger"));
+const prisma = new client_1.PrismaClient();
+class NotificationService {
+    /**
+     * Schedule "On This Day" notification for a user
+     */
+    async scheduleOnThisDayNotification(userId) {
+        try {
+            // Check if user has memories from this day in previous years
+            const today = new Date();
+            const month = today.getMonth() + 1;
+            const day = today.getDate();
+            const allContent = await prisma.content.findMany({
+                where: { userId },
+                orderBy: { timestamp: 'desc' },
+            });
+            const onThisDayContent = allContent.filter(item => {
+                const itemDate = new Date(item.timestamp);
+                return itemDate.getMonth() + 1 === month &&
+                    itemDate.getDate() === day &&
+                    itemDate.getFullYear() !== today.getFullYear();
+            });
+            if (onThisDayContent.length > 0) {
+                // Create notification record
+                await prisma.notification.create({
+                    data: {
+                        userId,
+                        type: 'on_this_day',
+                        title: 'On This Day',
+                        message: `You have ${onThisDayContent.length} ${onThisDayContent.length === 1 ? 'memory' : 'memories'} from this day in previous years`,
+                        data: JSON.stringify({
+                            count: onThisDayContent.length,
+                            years: [...new Set(onThisDayContent.map(c => new Date(c.timestamp).getFullYear()))],
+                        }),
+                        scheduled: true,
+                    },
+                });
+                logger_1.default.info(`Scheduled On This Day notification for user ${userId}`);
+            }
+        }
+        catch (error) {
+            logger_1.default.error('Error scheduling On This Day notification:', error);
+            throw error;
+        }
+    }
+    /**
+     * Send random memory notification
+     */
+    async sendRandomMemoryNotification(userId) {
+        try {
+            const count = await prisma.content.count({ where: { userId } });
+            if (count === 0)
+                return;
+            const skip = Math.floor(Math.random() * count);
+            const randomContent = await prisma.content.findFirst({
+                where: { userId },
+                skip,
+            });
+            if (randomContent) {
+                await prisma.notification.create({
+                    data: {
+                        userId,
+                        type: 'random_memory',
+                        title: 'Random Memory',
+                        message: randomContent.text?.substring(0, 100) || 'A memory from your past',
+                        data: JSON.stringify({
+                            contentId: randomContent.id,
+                            date: randomContent.timestamp,
+                        }),
+                    },
+                });
+                logger_1.default.info(`Sent random memory notification to user ${userId}`);
+            }
+        }
+        catch (error) {
+            logger_1.default.error('Error sending random memory notification:', error);
+            throw error;
+        }
+    }
+    /**
+     * Track notification engagement
+     */
+    async trackNotificationEngagement(userId, notificationId, action) {
+        try {
+            await prisma.notification.update({
+                where: { id: notificationId },
+                data: {
+                    read: action === 'clicked',
+                    clickedAt: action === 'clicked' ? new Date() : undefined,
+                },
+            });
+            logger_1.default.info(`Tracked notification ${action} for user ${userId}`);
+        }
+        catch (error) {
+            logger_1.default.error('Error tracking notification engagement:', error);
+            throw error;
+        }
+    }
+    /**
+     * Get user notifications
+     */
+    async getUserNotifications(userId, limit = 20) {
+        try {
+            return await prisma.notification.findMany({
+                where: { userId },
+                orderBy: { createdAt: 'desc' },
+                take: limit,
+            });
+        }
+        catch (error) {
+            logger_1.default.error('Error fetching user notifications:', error);
+            throw error;
+        }
+    }
+}
+exports.NotificationService = NotificationService;
+exports.notificationService = new NotificationService();

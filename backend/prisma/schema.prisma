@@ -45,6 +45,16 @@ model User {
   referralsMade      Referral[]   @relation("Referrer")
   referralReceived   Referral?    @relation("Referred")
 
+  // Content Protection (Phase 2.6)
+  watermarks         Watermark[]           @relation("WatermarkedContent")
+  screenshotWarnings ScreenshotDetection[] @relation("ScreenshotWarnings")
+  createdContent     ScreenshotDetection[] @relation("ContentCreator")
+
+  // Location & Context (Phase 2.7)
+  locationHistory    LocationHistory[]     @relation("UserLocations")
+  privacyZones       PrivacyZone[]         @relation("UserPrivacyZones")
+  locationPrompts    LocationPrompt[]      @relation("UserLocationPrompts")
+
   @@index([createdAt])
   @@index([email, createdAt])
 }
@@ -62,6 +72,36 @@ model RefreshToken {
   @@index([expiresAt])
   @@index([revoked])
 }
+
+model UserActivity {
+  id           String   @id @default(uuid())
+  userId       String
+  activityType String   // e.g., "daily_open", "rewind_scroll", "rewind_year_jump"
+  metadata     String?  // JSON string for additional data
+  timestamp    DateTime @default(now())
+
+  @@index([userId])
+  @@index([activityType])
+  @@index([timestamp])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String   // "on_this_day", "random_memory", etc.
+  title     String
+  message   String
+  data      String?  // JSON string
+  read      Boolean  @default(false)
+  scheduled Boolean  @default(false)
+  clickedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+}
+
 
 model SocialAccount {
   id           String    @id @default(uuid())
@@ -312,7 +352,7 @@ model Connection {
   // Relationship timeline
   startDate       DateTime?
   endDate         DateTime?
-  timeline        String?  // JSON: [{ date, event, strength }]
+  timeline        Json?    // Relationship evolution data
   
   // Metadata
   sharedEvents    Int      @default(0) // Count of shared BiographyEvents
@@ -343,7 +383,7 @@ model MemoryCollision {
   // AI Analysis
   confidence  Float    // 0-100 AI confidence in match
   verified    Boolean  @default(false)
-  perspectives String? // JSON: { userId: { text, photos, mood } }
+  perspectives Json?   // Different user perspectives
   
   // Collision source
   detectedBy  String   // temporal, spatial, mutual_mention
@@ -353,6 +393,58 @@ model MemoryCollision {
   
   @@index([timestamp])
   @@index([verified])
+}
+
+// ============================================
+// LIVING CHAPTERS & FEED (Phase 2.2)
+// ============================================
+
+model LivingChapter {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  title           String
+  content         String?  @db.Text // Optional summary
+  status          String   // active, completed, archived
+  startDate       DateTime
+  endDate         DateTime?
+  completionTrigger String? // "job_change", "moved", "manual"
+  
+  // Metadata
+  subscriberCount Int      @default(0)
+  viewCount       Int      @default(0)
+  releaseSchedule Json?    // { frequency: "weekly", day: "monday" }
+  
+  // Content
+  entries         LivingFeedEntry[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+}
+
+model LivingFeedEntry {
+  id        String   @id @default(uuid())
+  chapterId String
+  chapter   LivingChapter @relation(fields: [chapterId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  content   String   @db.Text
+  mood      String?
+  location  String?
+  mediaUrls String   // JSON array of URLs
+  
+  isPublic  Boolean  @default(true)
+  timestamp DateTime @default(now())
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([chapterId])
+  @@index([userId, timestamp])
 }
 
 model EventTag {
@@ -376,7 +468,7 @@ model EventTag {
   
   // Verification
   verifiedAt    DateTime?
-  verificationData String? // JSON: { photos: [], details: "" }
+  verificationData Json? // Photos, details added by tagged user
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -398,16 +490,16 @@ model StoryMerger {
   participants    String   // JSON array of user IDs
   
   // Content
-  mergedContent   String   // JSON: { userId: narrative, photos, mood }
+  mergedContent   Json   // Combined narrative
   
   // Monetization
   isPublished     Boolean  @default(false)
   price           Float?   // If selling merged chapter
-  revenueShare    String?  // JSON: { userId: percentage }
+  revenueShare    Json?  // Split percentages
   salesCount      Int      @default(0)
   
   // Approval
-  approvalStatus  String   // JSON: { userId: "pending"/"approved"/"declined" }
+  approvalStatus  Json   // Status map
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -417,59 +509,7 @@ model StoryMerger {
   @@index([eventDate])
 }
 
-// ============================================
-// ENGAGEMENT & RETENTION MODELS (Phase 2.2)
-// ============================================
 
-model LivingChapter {
-  id              String   @id @default(uuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  title           String
-  content         String? // Summary or intro
-  status          String   @default("active") // draft, active, completed
-  
-  startDate       DateTime
-  endDate         DateTime?
-  
-  // Auto-detection
-  completionTrigger String? // job_change, move, relationship_milestone
-  
-  // Engagement
-  subscriberCount Int      @default(0)
-  viewCount       Int      @default(0)
-  
-  // Feed entries in this chapter
-  entries         LivingFeedEntry[]
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([userId, status])
-}
-
-model LivingFeedEntry {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  content   String
-  mood      String?
-  location  String?
-  mediaUrls String   // JSON array of URLs
-  
-  isPublic  Boolean  @default(true)
-  timestamp DateTime @default(now())
-  
-  // Relations
-  chapterId String?
-  chapter   LivingChapter? @relation(fields: [chapterId], references: [id])
-  
-  createdAt DateTime @default(now())
-  
-  @@index([userId, timestamp])
-}
 
 // ============================================
 // GAMIFICATION & VIRAL LOOPS (Phase 2.3)
@@ -538,4 +578,101 @@ model Referral {
   updatedAt       DateTime     @updatedAt
   
   @@index([referrerId])
+}
+
+// ============================================
+// CONTENT PROTECTION (Phase 2.6)
+// ============================================
+
+model Watermark {
+  id            String   @id @default(uuid())
+  contentId     String
+  subscriberId  String
+  subscriber    User     @relation("WatermarkedContent", fields: [subscriberId], references: [id], onDelete: Cascade)
+  watermarkData String   // Unique identifier embedded in content
+  type          String   // visible, invisible, forensic
+  createdAt     DateTime @default(now())
+  
+  @@index([contentId])
+  @@index([subscriberId])
+}
+
+model ScreenshotDetection {
+  id            String   @id @default(uuid())
+  subscriberId  String
+  subscriber    User     @relation("ScreenshotWarnings", fields: [subscriberId], references: [id], onDelete: Cascade)
+  creatorId     String
+  creator       User     @relation("ContentCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  contentId     String
+  detectedAt    DateTime @default(now())
+  warningIssued Boolean  @default(true)
+  
+  @@index([subscriberId])
+  @@index([creatorId])
+}
+
+model ContentHash {
+  id          String   @id @default(uuid())
+  contentId   String   @unique
+  hash        String   @unique
+  blockchain  String?  // Polygon transaction ID
+  timestamp   DateTime @default(now())
+  verified    Boolean  @default(false)
+  
+  @@index([hash])
+}
+
+// ============================================
+// LOCATION & CONTEXT (Phase 2.7)
+// ============================================
+
+model LocationHistory {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation("UserLocations", fields: [userId], references: [id], onDelete: Cascade)
+  latitude      Float
+  longitude     Float
+  accuracy      Float    // Meters
+  timestamp     DateTime
+  dwellTime     Int?     // Minutes at location
+  placeName     String?  // "Starbucks", "Home", etc.
+  placeType     String?  // home, work, restaurant, etc.
+  isSignificant Boolean  @default(false)
+  
+  prompts       LocationPrompt[]
+  
+  @@index([userId, timestamp])
+  @@index([userId, isSignificant])
+}
+
+model PrivacyZone {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation("UserPrivacyZones", fields: [userId], references: [id], onDelete: Cascade)
+  latitude         Float
+  longitude        Float
+  radius           Int      // Meters
+  name             String   // "Home", "Work", etc.
+  trackingDisabled Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  
+  @@index([userId])
+}
+
+model LocationPrompt {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation("UserLocationPrompts", fields: [userId], references: [id], onDelete: Cascade)
+  locationId String
+  location   LocationHistory @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  question   String
+  response   String?  @db.Text
+  photos     String[] // URLs
+  audioUrl   String?
+  answered   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  answeredAt DateTime?
+  
+  @@index([userId, answered])
+  @@index([locationId])
 }

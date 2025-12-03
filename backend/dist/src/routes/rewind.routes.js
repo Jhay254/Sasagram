@@ -9,45 +9,22 @@ const auth_middleware_1 = require("../middleware/auth.middleware");
 const logger_1 = __importDefault(require("../utils/logger"));
 const router = (0, express_1.Router)();
 /**
- * GET /api/rewind/on-this-day
- * Get content from this day in previous years
+ * GET /api/rewind/feed
+ * Get main rewind feed
  */
-router.get('/on-this-day', auth_middleware_1.authenticate, async (req, res) => {
+router.get('/feed', auth_middleware_1.authenticate, async (req, res) => {
     try {
         const userId = req.user.id;
-        const timezoneOffset = parseInt(req.query.offset) || 0;
-        const memories = await rewind_service_1.rewindService.getOnThisDay(userId, timezoneOffset);
-        res.json(memories);
+        const cursor = req.query.cursor;
+        const limit = parseInt(req.query.limit) || 10;
+        const feed = await rewind_service_1.rewindService.getRewindFeed(userId, cursor, limit);
+        res.json(feed);
     }
     catch (error) {
-        logger_1.default.error('Error fetching On This Day memories:', error);
-        res.status(500).json({ error: 'Failed to fetch memories' });
+        logger_1.default.error('Error fetching rewind feed:', error);
+        res.status(500).json({ error: 'Failed to fetch rewind feed' });
     }
 });
-/**
- * GET /api/rewind/random
- * Get a random memory
- */
-router.get('/random', auth_middleware_1.authenticate, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const memory = await rewind_service_1.rewindService.getRandomMemory(userId);
-        res.json(memory);
-    }
-    catch (error) {
-        logger_1.default.error('Error fetching random memory:', error);
-        res.status(500).json({ error: 'Failed to fetch random memory' });
-    }
-});
-/**
- * GET /api/rewind/timeline
-import { Router } from 'express';
-import { rewindService } from '../services/engagement/rewind.service';
-import { authenticate, AuthRequest } from '../middleware/auth.middleware';
-import logger from '../utils/logger';
-
-const router = Router();
-
 /**
  * GET /api/rewind/on-this-day
  * Get content from this day in previous years
@@ -55,8 +32,9 @@ const router = Router();
 router.get('/on-this-day', auth_middleware_1.authenticate, async (req, res) => {
     try {
         const userId = req.user.id;
-        const timezoneOffset = parseInt(req.query.offset) || 0;
-        const memories = await rewind_service_1.rewindService.getOnThisDay(userId, timezoneOffset);
+        const dateStr = req.query.date;
+        const date = dateStr ? new Date(dateStr) : new Date();
+        const memories = await rewind_service_1.rewindService.getMemoryComparison(userId, date);
         res.json(memories);
     }
     catch (error) {

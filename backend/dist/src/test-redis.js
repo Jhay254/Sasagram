@@ -4,14 +4,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ioredis_1 = __importDefault(require("ioredis"));
-const redis = new ioredis_1.default({
-    host: 'localhost',
-    port: 6379,
-});
-redis.ping().then((result) => {
-    console.log('Redis PING:', result);
-    redis.quit();
-}).catch((err) => {
-    console.error('Redis Error:', err);
-    process.exit(1);
-});
+async function main() {
+    console.log('Testing Redis connection...');
+    try {
+        const redis = new ioredis_1.default({
+            host: '127.0.0.1',
+            port: 6379,
+            maxRetriesPerRequest: 1
+        });
+        console.log('Connecting...');
+        const result = await redis.ping();
+        console.log('PING result:', result);
+        await redis.quit();
+    }
+    catch (error) {
+        console.error('Redis connection failed:', error);
+    }
+}
+main();

@@ -360,6 +360,10 @@ function detectChapterBoundaries(timeline: Timeline): Chapter[] {
   - Insert media at appropriate points
   - Generate table of contents
   - Add metadata (word count, reading time)
+- [x] **Implement Narrative Tones**
+  - [x] Define `NarrativeTone` enum (Humorous, Nostalgic, Inspirational, etc.)
+  - [x] Update prompt templates to combine Style + Tone
+  - [x] Update `NarrativeService` to handle tone selection
 
 **Prompt Template Example (Conversational)**:
 ```

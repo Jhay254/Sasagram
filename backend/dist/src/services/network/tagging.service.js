@@ -39,6 +39,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.taggingService = exports.TaggingService = void 0;
 const client_1 = require("@prisma/client");
 const logger_1 = __importDefault(require("../../utils/logger"));
+const notification_service_1 = require("../notification.service");
+const invite_service_1 = require("../invite.service");
 const prisma = new client_1.PrismaClient();
 class TaggingService {
     /**
@@ -189,35 +191,20 @@ class TaggingService {
      * Send tag invitation email
      */
     async sendTagInvitation(taggerId, email, eventData) {
-        const tagger = await prisma.user.findUnique({ where: { id: taggerId } });
-        const inviteLink = `${process.env.FRONTEND_URL}/register?invite=tag&from=${taggerId}&event=${eventData.eventId}`;
-        // TODO: Implement email service integration
-        logger_1.default.info(`Tag invitation email would be sent to ${email}`, {
-            from: tagger?.name || tagger?.email,
+        // Generate invite token
+        const inviteToken = invite_service_1.inviteService.generateInviteToken('pending', email);
+        // Send invitation email
+        await notification_service_1.notificationService.sendInviteNotification(taggerId, email, eventData, inviteToken);
+        logger_1.default.info(`Tag invitation sent to ${email}`, {
+            taggerId,
             event: eventData.eventTitle,
-            link: inviteLink,
         });
     }
     /**
      * Send tag notification
      */
     async sendTagNotification(tagId) {
-        const tag = await prisma.eventTag.findUnique({
-            where: { id: tagId },
-            include: {
-                tagger: true,
-                taggedUser: true,
-            },
-        });
-        if (!tag)
-            return;
-        // TODO: Implement notification service (push notifications, in-app, email)
-        logger_1.default.info(`Tag notification would be sent`, {
-            tagId,
-            to: tag.taggedUser.email,
-            from: tag.tagger.name || tag.tagger.email,
-            event: tag.eventTitle,
-        });
+        await notification_service_1.notificationService.sendTagNotification(tagId);
     }
 }
 exports.TaggingService = TaggingService;

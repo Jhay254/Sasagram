@@ -209,7 +209,6 @@ They tag more friends → Loop continues
 **Goal**: Build daily habits and addictive features.
 
 ### Week 7-9: Living Chapters
-
 **Database**:
 ```prisma
 model LivingChapter {

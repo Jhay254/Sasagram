@@ -27,7 +27,7 @@ const revenueData = [
     { month: 'Jun', revenue: 0, subscribers: 0 },
 ];
 
-const transactions = [
+const transactions: any[] = [
     // Mock transactions will go here
 ];
 
