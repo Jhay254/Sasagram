@@ -4,6 +4,7 @@ const express_1 = require("express");
 const bullmq_1 = require("bullmq");
 const narrative_1 = require("../types/narrative");
 const logger_1 = require("../utils/logger");
+const auth_middleware_1 = require("../middleware/auth.middleware");
 const router = (0, express_1.Router)();
 const REDIS_CONNECTION = {
     host: process.env.REDIS_HOST || 'localhost',
@@ -18,13 +19,11 @@ const biographyQueue = new bullmq_1.Queue('biography-generation', {
  * POST /api/biography/generate
  * Start biography generation
  */
-router.post('/generate', async (req, res) => {
+router.post('/generate', auth_middleware_1.authenticate, async (req, res) => {
     try {
-        const { userId, style, options } = req.body;
-        // Validate input
-        if (!userId) {
-            return res.status(400).json({ error: 'userId is required' });
-        }
+        // Use authenticated user's ID - prevent unauthorized generation
+        const userId = req.user.id;
+        const { style, options } = req.body;
         if (!style || !Object.values(narrative_1.NarrativeStyle).includes(style)) {
             return res.status(400).json({ error: 'Valid style is required' });
         }

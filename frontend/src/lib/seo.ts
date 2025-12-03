@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
 export const siteConfig = {
-    name: "Lifeline",
+    name: "Sasagram",
     description: "Transform your digital memories into compelling, AI-generated biographies. Share your life story with the world.",
-    url: process.env.NEXT_PUBLIC_APP_URL || "https://lifeline.app",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://sasagram.app",
     ogImage: "/og-image.jpg",
     links: {
-        twitter: "https://twitter.com/lifelineapp",
-        github: "https://github.com/yourusername/lifeline",
+        twitter: "https://twitter.com/sasagramapp",
+        github: "https://github.com/yourusername/sasagram",
     },
 };
 
@@ -37,9 +37,10 @@ export function generateMetadata({
             "memoir",
             "autobiography",
             "content creation",
+            "sasagram",
         ],
-        authors: [{ name: "Lifeline Team" }],
-        creator: "Lifeline",
+        authors: [{ name: "Sasagram Team" }],
+        creator: "Sasagram",
         openGraph: {
             type: "website",
             locale: "en_US",
@@ -61,7 +62,7 @@ export function generateMetadata({
             title: metaTitle,
             description: metaDescription,
             images: [metaImage],
-            creator: "@lifelineapp",
+            creator: "@sasagramapp",
         },
         robots: {
             index: !noIndex,

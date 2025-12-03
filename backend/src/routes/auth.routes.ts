@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { authService } from '../services/auth/auth.service';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
+import { validate } from '../middleware/validate.middleware';
+import { registerSchema, loginSchema, refreshTokenSchema } from '../validators/auth.validator';
 
 const router = Router();
 
@@ -8,18 +10,10 @@ const router = Router();
  * POST /auth/register
  * Register a new user
  */
-router.post('/register', async (req, res) => {
+router.post('/register', validate(registerSchema), async (req, res) => {
     try {
+        // Zod validation already applied via middleware
         const { email, password, name } = req.body;
-
-        // Basic validation
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
-        }
-
-        if (password.length < 8) {
-            return res.status(400).json({ error: 'Password must be at least 8 characters' });
-        }
 
         const result = await authService.register(email, password, name);
 
@@ -36,13 +30,10 @@ router.post('/register', async (req, res) => {
  * POST /auth/login
  * Login user
  */
-router.post('/login', async (req, res) => {
+router.post('/login', validate(loginSchema), async (req, res) => {
     try {
+        // Zod validation already applied via middleware
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
-        }
 
         const result = await authService.login(email, password);
 
@@ -59,13 +50,10 @@ router.post('/login', async (req, res) => {
  * POST /auth/refresh
  * Refresh access token
  */
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', validate(refreshTokenSchema), async (req, res) => {
     try {
+        // Zod validation already applied via middleware
         const { refreshToken } = req.body;
-
-        if (!refreshToken) {
-            return res.status(400).json({ error: 'Refresh token is required' });
-        }
 
         const result = await authService.refreshAccessToken(refreshToken);
 

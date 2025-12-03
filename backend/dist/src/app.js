@@ -57,6 +57,9 @@ app.use('/api-docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.de
 }));
 // Apply global rate limiter to all requests
 app.use(rate_limit_middleware_1.globalLimiter);
+// Audit logging for write operations
+const audit_middleware_1 = require("./middleware/audit.middleware");
+app.use(audit_middleware_1.auditMiddleware);
 // Routes
 app.use('/auth', rate_limit_middleware_1.authLimiter, auth_routes_1.default); // Phase 1: Authentication
 app.use('/auth', rate_limit_middleware_1.oauthLimiter, oauth_routes_1.default);

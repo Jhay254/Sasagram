@@ -1,4 +1,4 @@
-# Lifeline Monetization API Documentation
+# Sasagram Monetization API Documentation
 
 ## Authentication
 All endpoints (except webhooks) require a valid Bearer token in the Authorization header.

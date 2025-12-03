@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.emailQueue = exports.mediaQueue = void 0;
+exports.videoQueue = exports.emailQueue = exports.mediaQueue = void 0;
 const bull_1 = __importDefault(require("bull"));
 const media_service_1 = require("./media.service");
 const mediaService = new media_service_1.MediaService();
@@ -15,6 +15,7 @@ const redisConfig = {
 // Create queues
 exports.mediaQueue = new bull_1.default('media-processing', { redis: redisConfig });
 exports.emailQueue = new bull_1.default('email-processing', { redis: redisConfig });
+exports.videoQueue = new bull_1.default('video-processing', { redis: redisConfig });
 // Process Media Jobs
 exports.mediaQueue.process(async (job) => {
     const { url, userId, provider, contentId } = job.data;

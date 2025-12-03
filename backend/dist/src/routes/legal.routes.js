@@ -1,7 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const rate_limit_middleware_1 = require("../middleware/rate-limit.middleware");
+const facebook_service_1 = require("../services/facebook.service");
 const router = (0, express_1.Router)();
+const facebookService = new facebook_service_1.FacebookService();
 const privacyPolicy = `
 <!DOCTYPE html>
 <html>
@@ -76,15 +79,29 @@ router.get('/data-deletion', (req, res) => {
 });
 // Meta Data Deletion Callback
 // Meta sends a POST request here when a user removes the app
-router.post('/data-deletion-callback', (req, res) => {
+router.post('/data-deletion-callback', rate_limit_middleware_1.publicEndpointLimiter, (req, res) => {
     try {
-        // In a real app, we would verify the 'signed_request' parameter here
-        // const signedRequest = req.body.signed_request;
+        const { signed_request } = req.body;
+        // Verify signed request to prevent unauthorized deletion requests
+        if (!signed_request) {
+            return res.status(400).json({ error: 'Missing signed_request parameter' });
+        }
+        const verification = facebookService.verifySignedRequest(signed_request);
+        if (!verification.valid) {
+            return res.status(401).json({ error: 'Invalid signature' });
+        }
+        // Extract user ID from verified data
+        const userId = verification.data?.user_id;
+        if (!userId) {
+            return res.status(400).json({ error: 'Missing user_id in signed request' });
+        }
         // Generate a confirmation code
         const confirmationCode = 'del_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        // TODO: Schedule actual user data deletion in background job
+        // await dataService.scheduleUserDataDeletion(userId);
         // Return the JSON response Meta expects
         res.json({
-            url: `${process.env.BASE_URL || 'http://localhost:3000'}/data-deletion-status?code=${confirmationCode}`,
+            url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/data-deletion-status?code=${confirmationCode}`,
             confirmation_code: confirmationCode,
         });
     }

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mediaLimiter = exports.oauthLimiter = exports.authLimiter = exports.globalLimiter = void 0;
+exports.inviteClaimLimiter = exports.publicEndpointLimiter = exports.mediaLimiter = exports.oauthLimiter = exports.authLimiter = exports.globalLimiter = void 0;
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 /**
  * Global rate limiter - applies to all requests
@@ -48,4 +48,37 @@ exports.mediaLimiter = (0, express_rate_limit_1.default)({
     message: 'Too many media requests, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
+});
+/**
+ * Rate limiter for public endpoints (more restrictive)
+ */
+exports.publicEndpointLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // 10 requests per window
+    message: { error: 'Too many requests from this IP, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => {
+        res.status(429).json({
+            error: 'Too many requests',
+            retryAfter: Math.ceil(15 * 60), // seconds
+        });
+    },
+});
+/**
+ * Rate limiter for invite claim endpoint (very restrictive)
+ */
+exports.inviteClaimLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 claim attempts
+    message: { error: 'Too many claim attempts, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true, // Only count failed attempts
+    handler: (req, res) => {
+        res.status(429).json({
+            error: 'Too many claim attempts',
+            retryAfter: Math.ceil(15 * 60),
+        });
+    },
 });

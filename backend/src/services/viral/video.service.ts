@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import logger from '../../utils/logger';
+import path from 'path';
 
 const prisma = new PrismaClient();
 
@@ -81,23 +82,87 @@ export class VideoService {
     }
 
     /**
-     * Generate a snippet (mock implementation for now)
-     * In production, this would call Remotion SSR or a render service
+     * Generate a snippet using Remotion rendering
+     * Returns a job ID for tracking progress
      */
-    async generateSnippet(data: VideoCompositionData): Promise<{ url: string; jobId: string }> {
+    async generateSnippet(data: VideoCompositionData): Promise<{ jobId: string; status: string }> {
         try {
-            logger.info('Generating snippet with data:', { chapterId: data.chapterId, template: data.templateId });
+            const { videoQueue } = await import('../queue.service');
 
-            // Simulate rendering delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            logger.info('Dispatching video generation job', {
+                chapterId: data.chapterId,
+                template: data.templateId
+            });
 
-            // Return a mock URL (in real app, this would be the S3/R2 URL of the rendered video)
+            // Generate output path
+            const timestamp = Date.now();
+            const filename = `${data.chapterId}_${timestamp}.mp4`;
+            const outputPath = path.join(process.cwd(), 'uploads', 'snippets', filename);
+
+            // Add job to queue
+            const job = await videoQueue.add({
+                chapterId: data.chapterId,
+                title: data.title,
+                images: data.images,
+                music: data.music,
+                templateId: data.templateId,
+                outputPath,
+            });
+
+            logger.info(`Video generation job created: ${job.id}`);
+
             return {
-                url: `https://storage.lifeline.app/snippets/${data.chapterId}_${Date.now()}.mp4`,
-                jobId: `job_${Date.now()}`,
+                jobId: job.id.toString(),
+                status: 'processing',
             };
         } catch (error) {
             logger.error('Error generating snippet:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get video generation job status
+     */
+    async getJobStatus(jobId: string): Promise<{
+        status: string;
+        progress?: number;
+        url?: string;
+        error?: string;
+    }> {
+        try {
+            const { videoQueue } = await import('../queue.service');
+            const job = await videoQueue.getJob(jobId);
+
+            if (!job) {
+                return { status: 'not_found' };
+            }
+
+            const state = await job.getState();
+            const progress = job.progress();
+
+            if (state === 'completed') {
+                const result = job.returnvalue;
+                return {
+                    status: 'completed',
+                    url: result.outputPath,
+                    progress: 100,
+                };
+            }
+
+            if (state === 'failed') {
+                return {
+                    status: 'failed',
+                    error: job.failedReason,
+                };
+            }
+
+            return {
+                status: state,
+                progress: typeof progress === 'number' ? progress : undefined,
+            };
+        } catch (error) {
+            logger.error('Error getting job status:', error);
             throw error;
         }
     }

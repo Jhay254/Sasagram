@@ -3,13 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const auth_middleware_1 = require("../middleware/auth.middleware");
+const express_1 = require("express");
 const location_service_1 = require("../services/location/location.service");
-const privacy_service_1 = require("../services/location/privacy.service");
 const interrogation_service_1 = require("../services/location/interrogation.service");
+const privacy_service_1 = require("../services/location/privacy.service");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const authorization_middleware_1 = require("../middleware/authorization.middleware");
 const logger_1 = __importDefault(require("../utils/logger"));
-const router = express_1.default.Router();
+const router = (0, express_1.Router)();
 /**
  * POST /api/location/record
  * Record a location point
@@ -111,9 +112,9 @@ router.get('/privacy-zones', auth_middleware_1.authenticate, async (req, res) =>
 });
 /**
  * DELETE /api/location/privacy-zone/:id
- * Delete a privacy zone
+ * Delete a privacy zone (with ownership verification)
  */
-router.delete('/privacy-zone/:id', auth_middleware_1.authenticate, async (req, res) => {
+router.delete('/privacy-zone/:id', auth_middleware_1.authenticate, (0, authorization_middleware_1.authorizeOwnership)('privacy-zone'), async (req, res) => {
     try {
         const { id } = req.params;
         await privacy_service_1.privacyService.deletePrivacyZone(id);

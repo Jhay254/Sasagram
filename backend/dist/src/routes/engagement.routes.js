@@ -43,7 +43,12 @@ const streak_service_1 = require("../services/engagement/streak.service");
 const notification_service_1 = require("../services/engagement/notification.service");
 const analytics_service_1 = require("../services/engagement/analytics.service");
 const auth_middleware_1 = require("../middleware/auth.middleware");
+const authorization_middleware_1 = require("../middleware/authorization.middleware");
+const validate_middleware_1 = require("../middleware/validate.middleware");
+const engagement_validator_1 = require("../validators/engagement.validator");
+const client_1 = require("@prisma/client");
 const logger_1 = __importDefault(require("../utils/logger"));
+const prisma = new client_1.PrismaClient();
 const router = (0, express_1.Router)();
 // ==========================================
 // CHAPTER ROUTES
@@ -52,7 +57,7 @@ const router = (0, express_1.Router)();
  * POST /api/engagement/chapters
  * Create/Start a new chapter
  */
-router.post('/chapters', auth_middleware_1.authenticate, async (req, res) => {
+router.post('/chapters', auth_middleware_1.authenticate, (0, validate_middleware_1.validate)(engagement_validator_1.createChapterSchema), async (req, res) => {
     try {
         const userId = req.user.id;
         const { title, content, startDate, endDate } = req.body;
@@ -76,7 +81,7 @@ router.post('/chapters', auth_middleware_1.authenticate, async (req, res) => {
  * POST /api/engagement/chapters/:id/complete
  * Complete a chapter
  */
-router.post('/chapters/:id/complete', auth_middleware_1.authenticate, async (req, res) => {
+router.post('/chapters/:id/complete', auth_middleware_1.authenticate, (0, authorization_middleware_1.authorizeOwnership)('chapter'), async (req, res) => {
     try {
         const { id } = req.params;
         const { trigger } = req.body;
@@ -135,7 +140,6 @@ router.get('/chapters/:id/analytics', auth_middleware_1.authenticate, async (req
 });
 // ==========================================
 // FEED ROUTES
-// ==========================================
 /**
  * POST /api/engagement/feed
  * Create a new feed entry
@@ -185,7 +189,7 @@ router.get('/feed', auth_middleware_1.authenticate, async (req, res) => {
  * POST /api/engagement/chapters/:id/permissions
  * Grant permission to a user
  */
-router.post('/chapters/:id/permissions', auth_middleware_1.authenticate, async (req, res) => {
+router.post('/chapters/:id/permissions', auth_middleware_1.authenticate, (0, validate_middleware_1.validate)(engagement_validator_1.addPermissionSchema), async (req, res) => {
     try {
         const userId = req.user.id;
         const { id } = req.params;

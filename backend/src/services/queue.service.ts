@@ -12,6 +12,7 @@ const redisConfig = {
 // Create queues
 export const mediaQueue = new Queue('media-processing', { redis: redisConfig });
 export const emailQueue = new Queue('email-processing', { redis: redisConfig });
+export const videoQueue = new Queue('video-processing', { redis: redisConfig });
 
 // Define job types
 interface MediaDownloadJob {
@@ -19,6 +20,15 @@ interface MediaDownloadJob {
     userId: string;
     provider: string;
     contentId?: string;
+}
+
+interface VideoGenerationJob {
+    chapterId: string;
+    title: string;
+    images: string[];
+    music?: string;
+    templateId: 'cinematic' | 'fast-paced' | 'minimal';
+    outputPath: string;
 }
 
 // Process Media Jobs

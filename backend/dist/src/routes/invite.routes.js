@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const invite_service_1 = require("../services/invite.service");
+const rate_limit_middleware_1 = require("../middleware/rate-limit.middleware");
 const logger_1 = __importDefault(require("../utils/logger"));
 const router = (0, express_1.Router)();
 /**
@@ -68,7 +69,7 @@ router.get('/:token', async (req, res) => {
  *       200:
  *         description: User registered and invite claimed
  */
-router.post('/:token/claim', async (req, res) => {
+router.post('/:token/claim', rate_limit_middleware_1.inviteClaimLimiter, async (req, res) => {
     try {
         const { token } = req.params;
         const { name, email, password } = req.body;

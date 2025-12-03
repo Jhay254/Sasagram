@@ -3,6 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { collisionDetectionService } from '../services/network/collision-detection.service';
 import { connectionService } from '../services/network/connection.service';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
+import { validate, validateParams } from '../middleware/validate.middleware';
+import { connectionSchema, relationshipTimelineSchema } from '../validators/network.validator';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -49,7 +51,7 @@ router.get('/memory-graph', authenticate, async (req: AuthRequest, res) => {
  * GET /api/network/relationship/:userId
  * Get relationship timeline with another user
  */
-router.get('/relationship/:userId', authenticate, async (req: AuthRequest, res) => {
+router.get('/relationship/:userId', authenticate, validateParams(relationshipTimelineSchema), async (req: AuthRequest, res) => {
     try {
         const currentUserId = req.user!.id;
         const otherUserId = req.params.userId;
@@ -70,7 +72,7 @@ router.get('/relationship/:userId', authenticate, async (req: AuthRequest, res) 
  * POST /api/network/connection
  * Manually create/strengthen connection
  */
-router.post('/connection', authenticate, async (req: AuthRequest, res) => {
+router.post('/connection', authenticate, validate(connectionSchema), async (req: AuthRequest, res) => {
     try {
         const userId = req.user!.id;
         const { otherUserId, relationshipType } = req.body;

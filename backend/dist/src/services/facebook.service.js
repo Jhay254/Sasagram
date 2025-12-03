@@ -5,8 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FacebookService = void 0;
 const axios_1 = __importDefault(require("axios"));
+const crypto_1 = __importDefault(require("crypto"));
 const client_1 = require("@prisma/client");
 const queue_service_1 = require("./queue.service");
+const logger_1 = __importDefault(require("../utils/logger"));
 const prisma = new client_1.PrismaClient();
 class FacebookService {
     constructor() {
@@ -107,6 +109,45 @@ class FacebookService {
         catch (error) {
             console.error('Error fetching Facebook posts:', error);
             // Don't throw here to avoid failing the whole auth process if just posts fail
+        }
+    }
+    /**
+     * Verify a signed request from Facebook
+     * Used for data deletion callbacks and other secure Facebook Platform features
+     */
+    verifySignedRequest(signedRequest) {
+        try {
+            if (!signedRequest || !signedRequest.includes('.')) {
+                logger_1.default.warn('Invalid signed request format');
+                return { valid: false };
+            }
+            const [encodedSig, payload] = signedRequest.split('.');
+            // Decode signature from base64url
+            const sig = Buffer.from(encodedSig, 'base64url');
+            // Decode payload from base64url
+            const data = JSON.parse(Buffer.from(payload, 'base64url').toString());
+            // Get app secret from environment
+            const appSecret = this.clientSecret;
+            if (!appSecret) {
+                logger_1.default.error('FACEBOOK_CLIENT_SECRET not configured');
+                return { valid: false };
+            }
+            // Calculate expected signature
+            const expectedSig = crypto_1.default
+                .createHmac('sha256', appSecret)
+                .update(payload)
+                .digest();
+            // Use timing-safe comparison to prevent timing attacks
+            if (!crypto_1.default.timingSafeEqual(sig, expectedSig)) {
+                logger_1.default.warn('Facebook signed request signature mismatch');
+                return { valid: false };
+            }
+            logger_1.default.info('Facebook signed request verified successfully');
+            return { valid: true, data };
+        }
+        catch (error) {
+            logger_1.default.error('Error verifying Facebook signed request:', error);
+            return { valid: false };
         }
     }
 }

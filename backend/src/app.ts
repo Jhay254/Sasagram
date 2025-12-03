@@ -62,6 +62,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 // Apply global rate limiter to all requests
 app.use(globalLimiter);
 
+// Audit logging for write operations
+import { auditMiddleware } from './middleware/audit.middleware';
+app.use(auditMiddleware);
+
+
 // Routes
 app.use('/auth', authLimiter, authRoutes); // Phase 1: Authentication
 app.use('/auth', oauthLimiter, oauthRoutes);

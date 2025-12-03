@@ -4,6 +4,8 @@ const express_1 = require("express");
 const media_service_1 = require("../services/media.service");
 const deduplication_service_1 = require("../services/deduplication.service");
 const auth_middleware_1 = require("../middleware/auth.middleware");
+const validate_middleware_1 = require("../middleware/validate.middleware");
+const media_validator_1 = require("../validators/media.validator");
 const router = (0, express_1.Router)();
 const mediaService = new media_service_1.MediaService();
 const deduplicationService = new deduplication_service_1.DeduplicationService();
@@ -20,7 +22,7 @@ router.get('/stats', auth_middleware_1.authenticate, async (req, res) => {
     }
 });
 // Optimize user media
-router.post('/optimize', auth_middleware_1.authenticate, async (req, res) => {
+router.post('/optimize', auth_middleware_1.authenticate, (0, validate_middleware_1.validate)(media_validator_1.optimizeMediaSchema), async (req, res) => {
     try {
         const userId = req.user.id;
         const processed = await mediaService.processUserMedia(userId);
@@ -32,7 +34,7 @@ router.post('/optimize', auth_middleware_1.authenticate, async (req, res) => {
     }
 });
 // Run deduplication
-router.post('/deduplicate', auth_middleware_1.authenticate, async (req, res) => {
+router.post('/deduplicate', auth_middleware_1.authenticate, (0, validate_middleware_1.validate)(media_validator_1.deduplicateSchema), async (req, res) => {
     try {
         const userId = req.user.id;
         const result = await deduplicationService.deduplicateAll(userId);

@@ -36,7 +36,7 @@ Each endpoint includes:
   - Try-it-out functionality
   - Schema validation
   - Authentication support
-  - Custom branding (Lifeline)
+  - Custom branding (Sasagram)
 
 ## 🎯 How to Use
 
@@ -93,7 +93,7 @@ Each endpoint includes:
 
 ### Custom Styling
 - Topbar hidden for cleaner look
-- Custom site title: "Lifeline API Documentation"
+- Custom site title: "Sasagram API Documentation"
 
 ## 🚀 Benefits
 

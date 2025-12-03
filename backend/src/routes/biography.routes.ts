@@ -3,6 +3,7 @@ import { Queue } from 'bullmq';
 import { BiographyGenerationJobData } from '../jobs/biography-generation.job';
 import { NarrativeStyle } from '../types/narrative';
 import { logger } from '../utils/logger';
+import { authenticate, AuthRequest } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -21,14 +22,11 @@ const biographyQueue = new Queue('biography-generation', {
  * POST /api/biography/generate
  * Start biography generation
  */
-router.post('/generate', async (req: Request, res: Response) => {
+router.post('/generate', authenticate, async (req: AuthRequest, res: Response) => {
     try {
-        const { userId, style, options } = req.body;
-
-        // Validate input
-        if (!userId) {
-            return res.status(400).json({ error: 'userId is required' });
-        }
+        // Use authenticated user's ID - prevent unauthorized generation
+        const userId = req.user!.id;
+        const { style, options } = req.body;
 
         if (!style || !Object.values(NarrativeStyle).includes(style)) {
             return res.status(400).json({ error: 'Valid style is required' });

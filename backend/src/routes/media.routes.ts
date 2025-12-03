@@ -2,6 +2,8 @@ import { Router, Response } from 'express';
 import { MediaService } from '../services/media.service';
 import { DeduplicationService } from '../services/deduplication.service';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
+import { validate } from '../middleware/validate.middleware';
+import { optimizeMediaSchema, deduplicateSchema } from '../validators/media.validator';
 
 const router = Router();
 const mediaService = new MediaService();
@@ -20,7 +22,7 @@ router.get('/stats', authenticate, async (req: AuthRequest, res: Response) => {
 });
 
 // Optimize user media
-router.post('/optimize', authenticate, async (req: AuthRequest, res: Response) => {
+router.post('/optimize', authenticate, validate(optimizeMediaSchema), async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user!.id;
         const processed = await mediaService.processUserMedia(userId);
@@ -32,7 +34,7 @@ router.post('/optimize', authenticate, async (req: AuthRequest, res: Response) =
 });
 
 // Run deduplication
-router.post('/deduplicate', authenticate, async (req: AuthRequest, res: Response) => {
+router.post('/deduplicate', authenticate, validate(deduplicateSchema), async (req: AuthRequest, res: Response) => {
     try {
         const userId = req.user!.id;
         const result = await deduplicationService.deduplicateAll(userId);

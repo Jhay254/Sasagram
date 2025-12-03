@@ -67,8 +67,8 @@ export function ReferralDashboard() {
         if (stats?.code && navigator.share) {
             try {
                 await navigator.share({
-                    title: 'Join Lifeline',
-                    text: 'Join me on Lifeline and preserve your life story!',
+                    title: 'Join Sasagram',
+                    text: 'Join me on Sasagram and preserve your life story!',
                     url: `${window.location.origin}/signup?ref=${stats.code}`,
                 });
             } catch (error) {

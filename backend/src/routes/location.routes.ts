@@ -1,11 +1,12 @@
-import express from 'express';
-import { authenticate, AuthRequest } from '../middleware/auth.middleware';
+import { Router } from 'express';
 import { locationService } from '../services/location/location.service';
-import { privacyService } from '../services/location/privacy.service';
 import { interrogationService } from '../services/location/interrogation.service';
+import { privacyService } from '../services/location/privacy.service';
+import { authenticate, AuthRequest } from '../middleware/auth.middleware';
+import { authorizeOwnership } from '../middleware/authorization.middleware';
 import logger from '../utils/logger';
 
-const router = express.Router();
+const router = Router();
 
 /**
  * POST /api/location/record
@@ -122,9 +123,9 @@ router.get('/privacy-zones', authenticate, async (req: AuthRequest, res) => {
 
 /**
  * DELETE /api/location/privacy-zone/:id
- * Delete a privacy zone
+ * Delete a privacy zone (with ownership verification)
  */
-router.delete('/privacy-zone/:id', authenticate, async (req: AuthRequest, res) => {
+router.delete('/privacy-zone/:id', authenticate, authorizeOwnership('privacy-zone'), async (req: AuthRequest, res) => {
     try {
         const { id } = req.params;
         await privacyService.deletePrivacyZone(id);

@@ -8,6 +8,8 @@ const client_1 = require("@prisma/client");
 const collision_detection_service_1 = require("../services/network/collision-detection.service");
 const connection_service_1 = require("../services/network/connection.service");
 const auth_middleware_1 = require("../middleware/auth.middleware");
+const validate_middleware_1 = require("../middleware/validate.middleware");
+const network_validator_1 = require("../validators/network.validator");
 const logger_1 = __importDefault(require("../utils/logger"));
 const router = (0, express_1.Router)();
 const prisma = new client_1.PrismaClient();
@@ -48,7 +50,7 @@ router.get('/memory-graph', auth_middleware_1.authenticate, async (req, res) => 
  * GET /api/network/relationship/:userId
  * Get relationship timeline with another user
  */
-router.get('/relationship/:userId', auth_middleware_1.authenticate, async (req, res) => {
+router.get('/relationship/:userId', auth_middleware_1.authenticate, (0, validate_middleware_1.validateParams)(network_validator_1.relationshipTimelineSchema), async (req, res) => {
     try {
         const currentUserId = req.user.id;
         const otherUserId = req.params.userId;
@@ -64,7 +66,7 @@ router.get('/relationship/:userId', auth_middleware_1.authenticate, async (req, 
  * POST /api/network/connection
  * Manually create/strengthen connection
  */
-router.post('/connection', auth_middleware_1.authenticate, async (req, res) => {
+router.post('/connection', auth_middleware_1.authenticate, (0, validate_middleware_1.validate)(network_validator_1.connectionSchema), async (req, res) => {
     try {
         const userId = req.user.id;
         const { otherUserId, relationshipType } = req.body;

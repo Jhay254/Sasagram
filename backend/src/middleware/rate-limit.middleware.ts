@@ -47,3 +47,38 @@ export const mediaLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
 });
+
+/**
+ * Rate limiter for public endpoints (more restrictive)
+ */
+export const publicEndpointLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // 10 requests per window
+    message: { error: 'Too many requests from this IP, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => {
+        res.status(429).json({
+            error: 'Too many requests',
+            retryAfter: Math.ceil(15 * 60), // seconds
+        });
+    },
+});
+
+/**
+ * Rate limiter for invite claim endpoint (very restrictive)
+ */
+export const inviteClaimLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 claim attempts
+    message: { error: 'Too many claim attempts, please try again later' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true, // Only count failed attempts
+    handler: (req, res) => {
+        res.status(429).json({
+            error: 'Too many claim attempts',
+            retryAfter: Math.ceil(15 * 60),
+        });
+    },
+});

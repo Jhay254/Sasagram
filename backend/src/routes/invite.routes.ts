@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { inviteService } from '../services/invite.service';
+import { inviteClaimLimiter } from '../middleware/rate-limit.middleware';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -67,7 +68,7 @@ router.get('/:token', async (req: Request, res: Response) => {
  *       200:
  *         description: User registered and invite claimed
  */
-router.post('/:token/claim', async (req: Request, res: Response) => {
+router.post('/:token/claim', inviteClaimLimiter, async (req: Request, res: Response) => {
     try {
         const { token } = req.params;
         const { name, email, password } = req.body;

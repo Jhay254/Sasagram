@@ -59,6 +59,11 @@ class MediaService {
      */
     async downloadAndStore(url, userId, provider, contentId) {
         try {
+            // Validate URL to prevent SSRF
+            if (!this.isValidUrl(url)) {
+                console.error(`Blocked potential SSRF attempt: ${url}`);
+                return null;
+            }
             // Download file
             const response = await axios_1.default.get(url, {
                 responseType: 'arraybuffer',
@@ -250,6 +255,42 @@ class MediaService {
             },
         });
         return stats;
+    }
+    /**
+     * Validate URL to prevent SSRF
+     * Blocks private IP ranges, localhost, and metadata services
+     */
+    isValidUrl(urlString) {
+        try {
+            const url = new URL(urlString);
+            // Allow only http and https
+            if (!['http:', 'https:'].includes(url.protocol)) {
+                return false;
+            }
+            const hostname = url.hostname;
+            // Block localhost
+            if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') {
+                return false;
+            }
+            // Block AWS metadata service
+            if (hostname === '169.254.169.254') {
+                return false;
+            }
+            // Block private IP ranges (basic check)
+            // 10.0.0.0/8
+            if (hostname.startsWith('10.'))
+                return false;
+            // 172.16.0.0/12
+            if (hostname.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./))
+                return false;
+            // 192.168.0.0/16
+            if (hostname.startsWith('192.168.'))
+                return false;
+            return true;
+        }
+        catch (error) {
+            return false;
+        }
     }
 }
 exports.MediaService = MediaService;

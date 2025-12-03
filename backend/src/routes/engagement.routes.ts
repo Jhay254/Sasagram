@@ -5,7 +5,13 @@ import { streakService } from '../services/engagement/streak.service';
 import { notificationService } from '../services/engagement/notification.service';
 import { analyticsService } from '../services/engagement/analytics.service';
 import { authenticate, AuthRequest } from '../middleware/auth.middleware';
+import { authorizeOwnership } from '../middleware/authorization.middleware';
+import { validate } from '../middleware/validate.middleware';
+import { createChapterSchema, updateChapterSchema, addPermissionSchema } from '../validators/engagement.validator';
+import { PrismaClient } from '@prisma/client';
 import logger from '../utils/logger';
+
+const prisma = new PrismaClient();
 
 const router = Router();
 
@@ -17,7 +23,7 @@ const router = Router();
  * POST /api/engagement/chapters
  * Create/Start a new chapter
  */
-router.post('/chapters', authenticate, async (req: AuthRequest, res) => {
+router.post('/chapters', authenticate, validate(createChapterSchema), async (req: AuthRequest, res) => {
     try {
         const userId = req.user!.id;
         const { title, content, startDate, endDate } = req.body;
@@ -44,7 +50,7 @@ router.post('/chapters', authenticate, async (req: AuthRequest, res) => {
  * POST /api/engagement/chapters/:id/complete
  * Complete a chapter
  */
-router.post('/chapters/:id/complete', authenticate, async (req: AuthRequest, res) => {
+router.post('/chapters/:id/complete', authenticate, authorizeOwnership('chapter'), async (req: AuthRequest, res) => {
     try {
         const { id } = req.params;
         const { trigger } = req.body;
@@ -104,7 +110,6 @@ router.get('/chapters/:id/analytics', authenticate, async (req: AuthRequest, res
 
 // ==========================================
 // FEED ROUTES
-// ==========================================
 
 /**
  * POST /api/engagement/feed
@@ -160,7 +165,7 @@ router.get('/feed', authenticate, async (req: AuthRequest, res) => {
  * POST /api/engagement/chapters/:id/permissions
  * Grant permission to a user
  */
-router.post('/chapters/:id/permissions', authenticate, async (req: AuthRequest, res) => {
+router.post('/chapters/:id/permissions', authenticate, validate(addPermissionSchema), async (req: AuthRequest, res) => {
     try {
         const userId = req.user!.id;
         const { id } = req.params;

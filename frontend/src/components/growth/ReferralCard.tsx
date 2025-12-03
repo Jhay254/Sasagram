@@ -48,10 +48,10 @@ export function ReferralCard() {
     const shareReferral = () => {
         if (stats?.code) {
             const url = `${window.location.origin}/signup?ref=${stats.code}`;
-            const text = `Join me on Lifeline and preserve your memories! Use my code: ${stats.code}`;
+            const text = `Join me on Sasagram and preserve your memories! Use my code: ${stats.code}`;
 
             if (navigator.share) {
-                navigator.share({ title: 'Join Lifeline', text, url });
+                navigator.share({ title: 'Join Sasagram', text, url });
             } else {
                 navigator.clipboard.writeText(`${text}\n${url}`);
                 setCopied(true);

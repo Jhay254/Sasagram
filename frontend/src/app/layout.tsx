@@ -20,9 +20,10 @@ export const metadata: Metadata = {
     "life story",
     "memoir",
     "autobiography",
+    "sasagram",
   ],
-  authors: [{ name: "Lifeline Team" }],
-  creator: "Lifeline",
+  authors: [{ name: "Sasagram Team" }],
+  creator: "Sasagram",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.name,
     description: siteConfig.description,
-    creator: "@lifelineapp",
+    creator: "@sasagramapp",
   },
   icons: {
     icon: "/favicon.ico",
