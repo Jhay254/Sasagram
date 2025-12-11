@@ -85,6 +85,56 @@ router.get('/subscribers', authenticate, async (req: any, res) => {
 });
 
 /**
+ * Create PayPal order for subscription
+ * POST /api/subscriptions/payment/paypal/create-order
+ */
+router.post('/payment/paypal/create-order', authenticate, async (req: any, res) => {
+    try {
+        const { tierId, creatorId } = req.body;
+        const userId = req.user.id;
+
+        if (!tierId || !creatorId) {
+            return res.status(400).json({ error: 'Missing required fields: tierId, creatorId' });
+        }
+
+        const result = await subscriptionService.createPayPalOrder(userId, creatorId, tierId);
+
+        res.json({
+            orderId: result.orderId,
+            approvalUrl: result.approvalUrl,
+        });
+    } catch (error: any) {
+        logger.error('Error creating PayPal order:', error);
+        res.status(400).json({ error: error.message });
+    }
+});
+
+/**
+ * Capture PayPal payment
+ * POST /api/subscriptions/payment/paypal/capture
+ */
+router.post('/payment/paypal/capture', authenticate, async (req: any, res) => {
+    try {
+        const { orderId } = req.body;
+        const userId = req.user.id;
+
+        if (!orderId) {
+            return res.status(400).json({ error: 'Missing orderId' });
+        }
+
+        const subscription = await subscriptionService.capturePayPalPayment(orderId, userId);
+
+        res.json({
+            success: true,
+            subscription,
+        });
+    } catch (error: any) {
+        logger.error('Error capturing PayPal payment:', error);
+        res.status(400).json({ error: error.message });
+    }
+});
+
+/**
  * PayPal Webhook Handler
  * POST /api/subscriptions/webhooks/paypal
  */

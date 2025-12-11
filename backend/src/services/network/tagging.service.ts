@@ -119,18 +119,23 @@ export class TaggingService {
      * Get pending tags for user
      */
     async getPendingTags(userId: string): Promise<any[]> {
-        return prisma.eventTag.findMany({
-            where: {
-                taggedUserId: userId,
-                status: 'pending',
-            },
-            include: {
-                tagger: {
-                    select: { id: true, name: true, email: true },
+        try {
+            return await prisma.eventTag.findMany({
+                where: {
+                    taggedUserId: userId,
+                    status: 'pending',
                 },
-            },
-            orderBy: { createdAt: 'desc' },
-        });
+                include: {
+                    tagger: {
+                        select: { id: true, name: true, email: true },
+                    },
+                },
+                orderBy: { createdAt: 'desc' },
+            });
+        } catch (error) {
+            logger.error('Error in getPendingTags:', error);
+            throw error;
+        }
     }
 
     /**

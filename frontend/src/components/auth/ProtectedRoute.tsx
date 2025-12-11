@@ -1,33 +1,43 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
+    requireAuth?: boolean;
+    redirectTo?: string;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({
+    children,
+    requireAuth = true,
+    redirectTo = '/login'
+}: ProtectedRouteProps) {
+    const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
-    const pathname = usePathname();
 
     useEffect(() => {
-        // Check if user is authenticated
-        const token = localStorage.getItem('token');
-
-        if (!token) {
-            // Store intended destination
-            localStorage.setItem('redirectAfterLogin', pathname);
-            router.push('/login');
+        if (!isLoading && requireAuth && !isAuthenticated) {
+            // Store the current path to redirect back after login
+            const currentPath = window.location.pathname;
+            router.push(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`);
         }
-    }, [router, pathname]);
+    }, [isAuthenticated, isLoading, requireAuth, redirectTo, router]);
 
-    // Check authentication on client side
-    if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            return null; // Don't render anything while redirecting
-        }
+    // Show loading state while checking authentication
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
+    // Don't render children if not authenticated and auth is required
+    if (requireAuth && !isAuthenticated) {
+        return null;
     }
 
     return <>{children}</>;

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { siteConfig } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -55,8 +56,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ErrorBoundary>
-          {children}
-          <Toaster />
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
         </ErrorBoundary>
       </body>
     </html>

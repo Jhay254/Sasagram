@@ -29,8 +29,10 @@ interface FeedEntry {
 export function LivingFeed() {
     const [entries, setEntries] = useState<FeedEntry[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         loadFeed();
     }, []);
 
@@ -67,7 +69,7 @@ export function LivingFeed() {
                                     <div className="flex flex-col">
                                         <span className="text-sm font-medium">{entry.user.name || 'User'}</span>
                                         <span className="text-xs text-muted-foreground">
-                                            {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
+                                            {isMounted ? formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true }) : '...'}
                                         </span>
                                     </div>
                                 </div>

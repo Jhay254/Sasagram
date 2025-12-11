@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { paymentService } from '../payment/payment.service';
+import paypalService from '../payment/paypal.service';
 import { logger } from '../../utils/logger';
 
 const prisma = new PrismaClient();
@@ -381,6 +382,143 @@ export class SubscriptionService {
             },
             orderBy: { createdAt: 'desc' },
         });
+    }
+
+    /**
+     * Create PayPal order for subscription
+     */
+    async createPayPalOrder(
+        userId: string,
+        creatorId: string,
+        tierId: string
+    ): Promise<{ orderId: string; approvalUrl: string }> {
+        try {
+            // Get tier details
+            const tier = await prisma.subscriptionTier.findUnique({
+                where: { id: tierId },
+                include: { creator: true },
+            });
+
+            if (!tier) {
+                throw new Error('Subscription tier not found');
+            }
+
+            if (!tier.isActive) {
+                throw new Error('Subscription tier is not active');
+            }
+
+            // Create PayPal order
+            const order = await paypalService.createOrder(
+                tierId,
+                tier.price,
+                'USD',
+                `${tier.name} subscription to ${tier.creator.displayName || tier.creator.name}`
+            );
+
+            // Find approval URL
+            const approvalLink = order.links.find((link) => link.rel === 'approve');
+            if (!approvalLink) {
+                throw new Error('PayPal approval URL not found');
+            }
+
+            // Store pending subscription
+            await prisma.subscription.create({
+                data: {
+                    subscriberId: userId,
+                    creatorId,
+                    tierId,
+                    status: 'pending',
+                    provider: 'paypal',
+                    providerSubId: order.id,
+                    currentPeriodStart: new Date(),
+                    currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+                },
+            });
+
+            return {
+                orderId: order.id,
+                approvalUrl: approvalLink.href,
+            };
+        } catch (error: any) {
+            logger.error('Error creating PayPal order:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Capture PayPal payment and activate subscription
+     */
+    async capturePayPalPayment(
+        orderId: string,
+        userId: string
+    ): Promise<any> {
+        try {
+            // Capture the payment
+            const captureResult = await paypalService.captureOrder(orderId);
+
+            if (captureResult.status !== 'COMPLETED') {
+                throw new Error('Payment was not completed');
+            }
+
+            // Find the subscription
+            const subscription = await prisma.subscription.findFirst({
+                where: {
+                    providerSubId: orderId,
+                    subscriberId: userId,
+                },
+                include: {
+                    tier: true,
+                    creator: true,
+                },
+            });
+
+            if (!subscription) {
+                throw new Error('Subscription not found');
+            }
+
+            // Update subscription to active
+            const updatedSubscription = await prisma.subscription.update({
+                where: { id: subscription.id },
+                data: {
+                    status: 'active',
+                    currentPeriodStart: new Date(),
+                    currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+                },
+            });
+
+            // Update creator's subscriber count
+            await prisma.user.update({
+                where: { id: subscription.creatorId },
+                data: {
+                    subscriberCount: { increment: 1 },
+                },
+            });
+
+            // Record the payment
+            const amount = parseFloat(captureResult.purchase_units[0].payments.captures[0].amount.value);
+            const creatorAmount = amount * 0.4; // 40% to creator
+            const platformFee = amount * 0.6; // 60% platform fee
+
+            await prisma.payment.create({
+                data: {
+                    subscriptionId: subscription.id,
+                    amount,
+                    currency: 'USD',
+                    provider: 'paypal',
+                    providerPaymentId: captureResult.purchase_units[0].payments.captures[0].id,
+                    status: 'succeeded',
+                    creatorAmount,
+                    platformFee,
+                },
+            });
+
+            logger.info(`Subscription ${subscription.id} activated for user ${userId}`);
+
+            return updatedSubscription;
+        } catch (error: any) {
+            logger.error('Error capturing PayPal payment:', error);
+            throw error;
+        }
     }
 }
 

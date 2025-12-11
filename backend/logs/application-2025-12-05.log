@@ -1,0 +1,167 @@
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-05 00:03:58"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-05 00:03:58"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-05 00:03:58"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-05 00:03:58"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-05 00:03:58"}
+{"level":"info","message":"Environment variables validated successfully","timestamp":"2025-12-05 00:04:00"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-05 00:04:00"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-05 00:04:00"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-05 00:04:00"}
+{"level":"info","message":"Starting background workers...","timestamp":"2025-12-05 00:04:00"}
+{"level":"info","message":"Starting video processing worker...","timestamp":"2025-12-05 00:04:00"}
+{"level":"info","message":"Background workers started","timestamp":"2025-12-05 00:04:00"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-05 00:04:01"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-05 00:04:01"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-05 00:04:01"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-05 00:18:16"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-05 00:18:16"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-05 00:18:16"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-05 00:18:16"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-05 00:18:16"}
+{"level":"info","message":"Environment variables validated successfully","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Starting background workers...","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Starting video processing worker...","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Background workers started","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-05 00:18:18"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-05 00:20:40"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-05 00:20:40"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-05 00:20:40"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-05 00:20:40"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-05 00:20:40"}
+{"level":"info","message":"Environment variables validated successfully","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Starting background workers...","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Starting video processing worker...","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Background workers started","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-05 00:20:42"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-05 00:29:38"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-05 00:29:38"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-05 00:29:38"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-05 00:29:38"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-05 00:29:38"}
+{"level":"info","message":"Environment variables validated successfully","timestamp":"2025-12-05 00:29:39"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-05 00:29:39"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-05 00:29:39"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-05 00:29:39"}
+{"level":"info","message":"Starting background workers...","timestamp":"2025-12-05 00:29:39"}
+{"level":"info","message":"Starting video processing worker...","timestamp":"2025-12-05 00:29:39"}
+{"level":"info","message":"Background workers started","timestamp":"2025-12-05 00:29:39"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-05 00:29:39"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-05 00:29:39"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-05 00:29:40"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-05 01:19:31"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-05 01:19:31"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-05 01:19:31"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-05 01:19:31"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-05 01:19:31"}
+{"level":"info","message":"Environment variables validated successfully","timestamp":"2025-12-05 01:19:32"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-05 01:19:32"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-05 01:19:32"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-05 01:19:32"}
+{"level":"info","message":"Starting background workers...","timestamp":"2025-12-05 01:19:32"}
+{"level":"info","message":"Starting video processing worker...","timestamp":"2025-12-05 01:19:32"}
+{"level":"info","message":"Background workers started","timestamp":"2025-12-05 01:19:32"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-05 01:19:32"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-05 01:19:32"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-05 01:19:33"}
+{"level":"warn","message":"Client Error: Route GET / not found","method":"GET","statusCode":404,"timestamp":"2025-12-05 01:19:35","url":"/"}
+{"level":"error","message":"GET / 404 38ms","timestamp":"2025-12-05 01:19:35"}
+{"level":"warn","message":"Client Error: Route GET /discover not found","method":"GET","statusCode":404,"timestamp":"2025-12-05 01:21:24","url":"/discover"}
+{"level":"error","message":"GET /discover 404 8ms","timestamp":"2025-12-05 01:21:24"}
+{"level":"warn","message":"Client Error: Route GET /favicon.ico not found","method":"GET","statusCode":404,"timestamp":"2025-12-05 01:21:24","url":"/favicon.ico"}
+{"level":"error","message":"GET /favicon.ico 404 4ms","timestamp":"2025-12-05 01:21:24"}
+{"level":"warn","message":"Client Error: Route GET /discover not found","method":"GET","statusCode":404,"timestamp":"2025-12-05 01:48:48","url":"/discover"}
+{"level":"error","message":"GET /discover 404 37ms","timestamp":"2025-12-05 01:48:48"}
+{"level":"info","message":"Running daily database backup...","timestamp":"2025-12-05 02:00:00"}
+{"level":"info","message":"Starting database backup: backup-db-2025-12-05T14-00-00-198Z.sql.gz","timestamp":"2025-12-05 02:00:00"}
+{"level":"error","message":"Database backup failed: Command failed: docker exec lifeline-postgres pg_dump -U lifeline lifeline_db | gzip > \"C:\\Users\\Administrator\\Documents\\Lifeline\\backend\\backups\\backup-db-2025-12-05T14-00-00-198Z.sql.gz\"\n'gzip' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","timestamp":"2025-12-05 02:00:00"}
+{"level":"error","message":"Database backup cron job failed: Command failed: docker exec lifeline-postgres pg_dump -U lifeline lifeline_db | gzip > \"C:\\Users\\Administrator\\Documents\\Lifeline\\backend\\backups\\backup-db-2025-12-05T14-00-00-198Z.sql.gz\"\n'gzip' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","timestamp":"2025-12-05 02:00:00"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-05 02:42:39"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-05 02:42:39"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-05 02:42:39"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-05 02:42:39"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-05 02:42:39"}
+{"level":"info","message":"Environment variables validated successfully","timestamp":"2025-12-05 02:42:40"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-05 02:42:40"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-05 02:42:40"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-05 02:42:40"}
+{"level":"info","message":"Starting background workers...","timestamp":"2025-12-05 02:42:40"}
+{"level":"info","message":"Starting video processing worker...","timestamp":"2025-12-05 02:42:40"}
+{"level":"info","message":"Background workers started","timestamp":"2025-12-05 02:42:40"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-05 02:42:41"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-05 02:42:41"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-05 02:42:41"}
+{"errors":[{"code":"invalid_type","expected":"string","message":"Invalid input: expected string, received undefined","path":["refreshToken"]}],"level":"warn","message":"Validation failed:","path":"/refresh","timestamp":"2025-12-05 03:49:14"}
+{"level":"error","message":"POST /refresh 400 89ms","timestamp":"2025-12-05 03:49:14"}
+{"level":"info","message":"Running backup cleanup...","timestamp":"2025-12-05 04:00:00"}
+{"level":"info","message":"Running backup cleanup...","timestamp":"2025-12-05 04:00:00"}
+{"level":"info","message":"Running scheduled token refresh...","timestamp":"2025-12-05 06:00:00"}
+{"level":"info","message":"Running scheduled token refresh...","timestamp":"2025-12-05 06:00:00"}
+{"level":"info","message":"Starting token refresh cycle...","timestamp":"2025-12-05 06:00:00"}
+{"level":"info","message":"Starting token refresh cycle...","timestamp":"2025-12-05 06:00:00"}
+{"level":"info","message":"Found 0 accounts with expiring tokens","timestamp":"2025-12-05 06:00:00"}
+{"level":"info","message":"Found 0 accounts with expiring tokens","timestamp":"2025-12-05 06:00:00"}
+{"level":"info","message":"Token refresh cycle completed","timestamp":"2025-12-05 06:00:00"}
+{"level":"info","message":"Token refresh cycle completed","timestamp":"2025-12-05 06:00:00"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Environment variables validated successfully","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Starting background workers...","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Starting video processing worker...","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Background workers started","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-05 06:10:29"}
+{"level":"info","message":"Environment variables validated successfully","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Starting background workers...","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Starting video processing worker...","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Background workers started","timestamp":"2025-12-05 06:10:32"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-05 06:10:33"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-05 06:10:33"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-05 06:10:33"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-05 06:10:33"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-05 06:10:33"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-05 06:10:34"}
+{"level":"info","message":"Queue created: biography-generation","timestamp":"2025-12-05 06:33:11"}
+{"level":"info","message":"Queue created: media-download","timestamp":"2025-12-05 06:33:11"}
+{"level":"info","message":"Queue created: sentiment-analysis","timestamp":"2025-12-05 06:33:11"}
+{"level":"info","message":"Queue created: email-notification","timestamp":"2025-12-05 06:33:11"}
+{"level":"info","message":"Queue created: data-sync","timestamp":"2025-12-05 06:33:11"}
+{"level":"info","message":"Environment variables validated successfully","timestamp":"2025-12-05 06:33:12"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-12-05 06:33:12"}
+{"level":"info","message":"Initializing cron jobs...","timestamp":"2025-12-05 06:33:12"}
+{"level":"info","message":"Cron jobs initialized successfully","timestamp":"2025-12-05 06:33:12"}
+{"level":"info","message":"Starting background workers...","timestamp":"2025-12-05 06:33:12"}
+{"level":"info","message":"Starting video processing worker...","timestamp":"2025-12-05 06:33:12"}
+{"level":"info","message":"Background workers started","timestamp":"2025-12-05 06:33:12"}
+{"level":"info","message":"Redis connected for PKCE storage","timestamp":"2025-12-05 06:33:13"}
+{"level":"info","message":"Redis client connected","timestamp":"2025-12-05 06:33:13"}
+{"level":"info","message":"Redis client ready","timestamp":"2025-12-05 06:33:13"}
+{"level":"warn","message":"Client Error: Route GET /favicon.ico not found","method":"GET","statusCode":404,"timestamp":"2025-12-05 07:09:57","url":"/favicon.ico?favicon.0b3bf435.ico"}
+{"level":"error","message":"GET /favicon.ico?favicon.0b3bf435.ico 404 200ms","timestamp":"2025-12-05 07:09:57"}
+{"level":"error","message":"POST /streak/record 401 174ms","timestamp":"2025-12-05 07:11:36"}
+{"level":"error","message":"GET /chapters/active 401 7ms","timestamp":"2025-12-05 07:11:36"}
+{"level":"error","message":"POST /streak/record 401 12ms","timestamp":"2025-12-05 07:11:36"}
+{"level":"error","message":"GET /feed 401 6ms","timestamp":"2025-12-05 07:11:37"}
+{"level":"error","message":"GET /feed 401 5ms","timestamp":"2025-12-05 07:11:37"}
+{"level":"error","message":"GET /chapters/active 401 7ms","timestamp":"2025-12-05 07:11:37"}

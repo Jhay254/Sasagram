@@ -31,11 +31,46 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // Handle 401 Unauthorized (e.g., redirect to login)
+        // Handle 401 Unauthorized
         if (error.response?.status === 401 && !originalRequest._retry) {
-            // TODO: Implement token refresh logic or redirect to login
+            originalRequest._retry = true;
+
             if (typeof window !== 'undefined') {
-                // window.location.href = '/login'; // Optional: Redirect
+                try {
+                    const refreshToken = localStorage.getItem('refreshToken');
+
+                    if (refreshToken) {
+                        // Try to refresh token
+                        const response = await axios.post(`${api.defaults.baseURL}/auth/refresh`, {
+                            refreshToken
+                        });
+
+                        const { accessToken } = response.data;
+
+                        // Update token in storage
+                        localStorage.setItem('token', accessToken);
+
+                        // Update authorization header
+                        api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+                        originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+
+                        // Retry original request
+                        return api(originalRequest);
+                    } else {
+                        // No refresh token available - redirect to login
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        window.location.href = '/login';
+                        return Promise.reject(error);
+                    }
+                } catch (refreshError) {
+                    // Refresh failed - clear tokens and redirect
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('user');
+                    window.location.href = '/login';
+                    return Promise.reject(refreshError);
+                }
             }
         }
 

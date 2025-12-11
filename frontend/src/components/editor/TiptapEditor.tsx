@@ -193,6 +193,7 @@ export function TiptapEditor({ content = '', onChange, onImageClick }: TiptapEdi
                 class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none max-w-none p-8',
             },
         },
+        immediatelyRender: false,
     });
 
     return (

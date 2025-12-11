@@ -30,8 +30,10 @@ export function ChapterDashboard() {
     const [createOpen, setCreateOpen] = useState(false);
     const [newTitle, setNewTitle] = useState('');
     const [newContent, setNewContent] = useState('');
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         loadActiveChapter();
     }, []);
 
@@ -109,7 +111,7 @@ export function ChapterDashboard() {
                             <div>
                                 <h3 className="text-2xl font-bold">{activeChapter.title}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Started {formatDistanceToNow(new Date(activeChapter.startDate), { addSuffix: true })}
+                                    Started {isMounted ? formatDistanceToNow(new Date(activeChapter.startDate), { addSuffix: true }) : '...'}
                                 </p>
                             </div>
 

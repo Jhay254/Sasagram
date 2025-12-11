@@ -39,16 +39,21 @@ export default function RegisterPage() {
         setError('');
 
         try {
-            const { confirmPassword, ...registerData } = data;
+            const { confirmPassword, firstName, lastName, ...rest } = data;
+            const registerData = {
+                ...rest,
+                name: `${firstName} ${lastName}`.trim(),
+            };
             const response = await api.post('/auth/register', registerData);
-            const { token, user } = response.data;
+            const { accessToken, refreshToken, user } = response.data;
 
-            // Store token in localStorage
-            localStorage.setItem('token', token);
+            // Store tokens in localStorage
+            localStorage.setItem('token', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('user', JSON.stringify(user));
 
-            // Redirect to onboarding
-            router.push('/onboarding');
+            // Redirect to dashboard
+            router.push('/dashboard');
         } catch (err: any) {
             setError(err.response?.data?.message || 'Registration failed. Please try again.');
         } finally {

@@ -11,8 +11,10 @@ import { format } from 'date-fns';
 export function OnThisDayCard() {
     const [memoryCount, setMemoryCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         checkMemories();
     }, []);
 
@@ -46,7 +48,7 @@ export function OnThisDayCard() {
                     {memoryCount} {memoryCount === 1 ? 'Memory' : 'Memories'} Found
                 </h3>
                 <p className="text-white/80 text-sm mb-4">
-                    See what you were doing on {format(new Date(), 'MMMM do')} in previous years.
+                    See what you were doing on {isMounted ? format(new Date(), 'MMMM do') : '...'} in previous years.
                 </p>
 
                 <Link href="/rewind">

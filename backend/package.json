@@ -79,6 +79,8 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.10.1",
     "@types/node-cron": "^3.0.11",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@types/supertest": "^6.0.3",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",

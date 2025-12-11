@@ -1,0 +1,14 @@
+{"level":"error","message":"GET / 404 38ms","timestamp":"2025-12-05 01:19:35"}
+{"level":"error","message":"GET /discover 404 8ms","timestamp":"2025-12-05 01:21:24"}
+{"level":"error","message":"GET /favicon.ico 404 4ms","timestamp":"2025-12-05 01:21:24"}
+{"level":"error","message":"GET /discover 404 37ms","timestamp":"2025-12-05 01:48:48"}
+{"level":"error","message":"Database backup failed: Command failed: docker exec lifeline-postgres pg_dump -U lifeline lifeline_db | gzip > \"C:\\Users\\Administrator\\Documents\\Lifeline\\backend\\backups\\backup-db-2025-12-05T14-00-00-198Z.sql.gz\"\n'gzip' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","timestamp":"2025-12-05 02:00:00"}
+{"level":"error","message":"Database backup cron job failed: Command failed: docker exec lifeline-postgres pg_dump -U lifeline lifeline_db | gzip > \"C:\\Users\\Administrator\\Documents\\Lifeline\\backend\\backups\\backup-db-2025-12-05T14-00-00-198Z.sql.gz\"\n'gzip' is not recognized as an internal or external command,\r\noperable program or batch file.\r\n","timestamp":"2025-12-05 02:00:00"}
+{"level":"error","message":"POST /refresh 400 89ms","timestamp":"2025-12-05 03:49:14"}
+{"level":"error","message":"GET /favicon.ico?favicon.0b3bf435.ico 404 200ms","timestamp":"2025-12-05 07:09:57"}
+{"level":"error","message":"POST /streak/record 401 174ms","timestamp":"2025-12-05 07:11:36"}
+{"level":"error","message":"GET /chapters/active 401 7ms","timestamp":"2025-12-05 07:11:36"}
+{"level":"error","message":"POST /streak/record 401 12ms","timestamp":"2025-12-05 07:11:36"}
+{"level":"error","message":"GET /feed 401 6ms","timestamp":"2025-12-05 07:11:37"}
+{"level":"error","message":"GET /feed 401 5ms","timestamp":"2025-12-05 07:11:37"}
+{"level":"error","message":"GET /chapters/active 401 7ms","timestamp":"2025-12-05 07:11:37"}

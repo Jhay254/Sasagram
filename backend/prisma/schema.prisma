@@ -17,6 +17,28 @@ model User {
 
   password  String?
   
+  // Creator Profile (for Discovery Feed)
+  username      String?  @unique
+  displayName   String?
+  bio           String?  @db.Text
+  archetype     String?  // "The Steady Climber", "The Late Bloomer", etc.
+  coverImage    String?
+  profileVideo  String?
+  avatar        String?
+  location      String?
+  
+  // Creator Metrics (calculated/cached)
+  subscriberCount Int     @default(0)
+  totalChapters   Int     @default(0)
+  avgRating       Float?
+  reviewCount     Int     @default(0)
+  trendingScore   Float   @default(0)
+  
+  // Discovery Metadata
+  categories      String[] // ["career-business", "creative-arts"]
+  urgencyOffer    Json?    // { type, message, expiresAt }
+  isFeatured      Boolean  @default(false)
+  
   socialAccounts SocialAccount[]
   contents       Content[]
   emailMetadata  EmailMetadata[]

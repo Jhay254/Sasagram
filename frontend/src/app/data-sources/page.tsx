@@ -69,8 +69,9 @@ export default function DataSourcesPage() {
     const handleConnect = async (sourceId: string) => {
         // TODO: Implement OAuth flow
         console.log('Connecting to', sourceId);
-        // For now, just open OAuth window
-        window.open(`/api/oauth/${sourceId}/connect`, '_blank', 'width=600,height=700');
+        // Use absolute URL for backend
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+        window.open(`${apiUrl}/oauth/${sourceId}`, '_blank', 'width=600,height=700');
     };
 
     const handleSync = async (sourceId: string) => {

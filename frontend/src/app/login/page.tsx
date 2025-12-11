@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { api } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 const loginSchema = z.object({
     email: z.string().email('Invalid email address'),
@@ -21,6 +21,8 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const { login, isAuthenticated } = useAuth();
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -28,22 +30,23 @@ export default function LoginPage() {
         resolver: zodResolver(loginSchema),
     });
 
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            const redirect = searchParams.get('redirect') || '/discover';
+            router.push(redirect);
+        }
+    }, [isAuthenticated, router, searchParams]);
+
     const onSubmit = async (data: LoginFormData) => {
         setIsLoading(true);
         setError('');
 
         try {
-            const response = await api.post('/auth/login', data);
-            const { token, user } = response.data;
-
-            // Store token in localStorage
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-
-            // Redirect to dashboard
-            router.push('/dashboard');
+            await login(data.email, data.password);
+            // Redirect is handled by AuthContext
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Login failed. Please try again.');
+            setError(err.message || 'Login failed. Please try again.');
         } finally {
             setIsLoading(false);
         }

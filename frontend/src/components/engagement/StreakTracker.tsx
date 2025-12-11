@@ -11,8 +11,10 @@ export function StreakTracker() {
     const [streak, setStreak] = useState(0);
     const [loading, setLoading] = useState(true);
     const [isNewDay, setIsNewDay] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         recordDailyOpen();
     }, []);
 
@@ -102,7 +104,7 @@ export function StreakTracker() {
                                     "h-2 w-2 rounded-full",
                                     i < streak ? "bg-orange-500" : "bg-muted"
                                 )}
-                                title={format(subDays(new Date(), streak - i - 1), 'MMM d')}
+                                title={isMounted ? format(subDays(new Date(), streak - i - 1), 'MMM d') : ''}
                             />
                         ))}
                         {streak > 30 && (

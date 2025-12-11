@@ -2,10 +2,10 @@ import rateLimit from 'express-rate-limit';
 
 /**
  * Global rate limiter - applies to all requests
- * 100 requests per 15 minutes
+ * 100 requests per second (effectively unlimited for dev)
  */
 export const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 1000, // 1 second
     max: 100,
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true,
@@ -14,11 +14,11 @@ export const globalLimiter = rateLimit({
 
 /**
  * Auth rate limiter - stricter for login/register
- * 5 requests per 15 minutes
+ * 100 requests per second
  */
 export const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5,
+    windowMs: 1000, // 1 second
+    max: 100,
     message: 'Too many authentication attempts, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
